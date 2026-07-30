@@ -1,0 +1,14 @@
+name: sirajum_monir
+description: Islamic Application
+publish_to: "none"
+
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/json/surahs.json
