@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
+
 import 'screens/splash/splash_screen.dart';
 
 class SirajumMonirApp extends StatelessWidget {
@@ -9,11 +10,14 @@ class SirajumMonirApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sirajum Monir',
+      title: "Sirajum Monir",
+
       debugShowCheckedModeBanner: false,
 
       theme: AppTheme.lightTheme,
+
       darkTheme: AppTheme.darkTheme,
+
       themeMode: ThemeMode.system,
 
       home: const SplashScreen(),
