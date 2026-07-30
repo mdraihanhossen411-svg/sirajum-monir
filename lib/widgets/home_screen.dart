@@ -72,3 +72,29 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+bottomNavigationBar: BottomNavigationBar(
+  currentIndex: 0,
+  type: BottomNavigationBarType.fixed,
+  items: const [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      label: "Home",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.menu_book),
+      label: "Quran",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.book),
+      label: "Hadith",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.favorite),
+      label: "Dua",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.more_horiz),
+      label: "More",
+    ),
+  ],
+)
