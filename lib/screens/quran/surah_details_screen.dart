@@ -1,4 +1,4 @@
-import 'surah_details_screen.dart';
+
 import 'package:flutter/material.dart';
 
 class SurahDetailsScreen extends StatelessWidget {
@@ -45,23 +45,4 @@ class SurahDetailsScreen extends StatelessWidget {
         
               "Surah content will be loaded here.",
               style: TextStyle(fontSize: 18),
-          onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => SurahDetailsScreen(
-        id: surah["id"]!,
-        name: surah["name"]!,
-        arabic: surah["arabic"]!,
-      ),
-    ),
-  );
-},
-            ),
-            
-          ],
-        ),
-      ),
-    );
-  }
-}
+    
