@@ -1,5 +1,10 @@
-import 'features/quran/quran_screen.dart';
+import 'package:flutter/material.dart';
+import 'app.dart';
 
 void main() {
-  QuranScreen().show();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(
+    const SirajumMonirApp(),
+  );
 }
