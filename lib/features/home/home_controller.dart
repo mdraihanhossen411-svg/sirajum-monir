@@ -22,6 +22,11 @@ class HomeController extends GetxController {
   void changeBottomIndex(int index) {
     state.value = state.value.copyWith(
       currentIndex: index,
+      void changeTab(int index) {
+  state.value = state.value.copyWith(
+    currentIndex: index,
+  );
+      }
     );
   }
 }
