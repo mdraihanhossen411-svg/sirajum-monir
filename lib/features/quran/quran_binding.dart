@@ -1,15 +1,13 @@
-class QuranState {
-  final bool isLoading;
+import 'package:get/get.dart';
 
-  const QuranState({
-    this.isLoading = false,
-  });
+import 'quran_controller.dart';
 
-  QuranState copyWith({
-    bool? isLoading,
-  }) {
-    return QuranState(
-      isLoading: isLoading ?? this.isLoading,
+class QuranBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<QuranController>(
+      () => QuranController(),
+      fenix: true,
     );
   }
 }
