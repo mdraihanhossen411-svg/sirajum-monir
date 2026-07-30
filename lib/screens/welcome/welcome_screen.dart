@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../home/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -10,7 +11,7 @@ class WelcomeScreen extends StatelessWidget {
 
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24.0),
 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -37,8 +38,9 @@ class WelcomeScreen extends StatelessWidget {
 
               const Text(
                 "Welcome to Sirajum Monir",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -46,7 +48,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 15),
 
               const Text(
-                "Learn Quran, Hadith, Dua, Prayer Times, Qibla and many more Islamic resources in one place.",
+                "Learn Quran, Hadith, Dua, Prayer Time, Qibla, Islamic Books and many more Islamic resources.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -54,35 +56,72 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 45),
 
               SizedBox(
                 width: double.infinity,
                 height: 55,
 
                 child: ElevatedButton(
-                  onPressed: () {},
+
+                  onPressed: () {
+
+                    Navigator.pushReplacement(
+
+                      context,
+
+                      MaterialPageRoute(
+
+                        builder: (_) => const HomeScreen(),
+
+                      ),
+
+                    );
+
+                  },
 
                   style: ElevatedButton.styleFrom(
+
                     backgroundColor: const Color(0xFF0E6B50),
+
                     shape: RoundedRectangleBorder(
+
                       borderRadius: BorderRadius.circular(15),
+
                     ),
+
                   ),
 
                   child: const Text(
+
                     "Let's Begin",
+
                     style: TextStyle(
-                      fontSize: 18,
+
                       color: Colors.white,
+
+                      fontSize: 18,
+
+                      fontWeight: FontWeight.bold,
+
                     ),
+
                   ),
+
                 ),
+
               ),
+
             ],
+
           ),
+
         ),
+
       ),
+
     );
+
   }
+
 }
