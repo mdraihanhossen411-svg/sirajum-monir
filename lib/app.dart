@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash/splash_screen.dart';
 
 class SirajumMonirApp extends StatelessWidget {
   const SirajumMonirApp({super.key});
@@ -15,7 +16,7 @@ class SirajumMonirApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
