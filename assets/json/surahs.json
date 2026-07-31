@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "id": 1,
+    "arabic": "الفاتحة",
+    "english": "Al-Fatihah",
+    "bangla": "আল-ফাতিহা",
+    "bangla_pronunciation": "আল ফাতিহা",
+    "ayahs": 7,
+    "revelation": "Makki",
+    "juz_start": 1,
+    "juz_end": 1,
+    "page_start": 1,
+    "page_end": 1,
+    "ruku": 1,
+    "audio": "001.mp3",
+    "is_favorite": false
+  },
+  {
+    "id": 2,
+    "arabic": "البقرة",
+    "english": "Al-Baqarah",
+    "bangla": "আল-বাকারা",
+    "bangla_pronunciation": "আল বাকারা",
+    "ayahs": 286,
+    "revelation": "Madani",
+    "juz_start": 1,
+    "juz_end": 3,
+    "page_start": 2,
+    "page_end": 49,
+    "ruku": 40,
+    "audio": "002.mp3",
+    "is_favorite": false
+  }
+ ]
