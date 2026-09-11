@@ -1,0 +1,280 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
+import '../models/quran_model.dart';
+import '../services/bookmark_service.dart';
+import '../widgets/ayah_card.dart';
+
+class SurahDetailPage extends StatefulWidget {
+  final SurahModel surah;
+  final int? initialAyah;
+
+  const SurahDetailPage({
+    super.key,
+    required this.surah,
+    this.initialAyah,
+  });
+
+  @override
+  State<SurahDetailPage> createState() => _SurahDetailPageState();
+}
+
+class _SurahDetailPageState extends State<SurahDetailPage> {
+  final BookmarkService _bookmarkService = BookmarkService();
+
+  List<Map<String, dynamic>> _ayahs = [];
+  final Set<String> _bookmarked = {};
+  final List<GlobalKey> _ayahKeys = [];
+  bool _loading = true;
+  String? _error;
+  int? _highlightAyah;
+
+  String _key(int ayah) => '${widget.surah.id}:$ayah';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final jsonString = await rootBundle.loadString(
+        'assets/json/quran/core/surah_${widget.surah.id}.json',
+      );
+      final data = json.decode(jsonString) as Map<String, dynamic>;
+      final rawAyahs = data['ayahs'] as List<dynamic>? ?? [];
+      final bookmarks = await _bookmarkService.load();
+
+      if (!mounted) return;
+
+      setState(() {
+        _ayahs = rawAyahs
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+
+        _ayahKeys
+          ..clear()
+          ..addAll(List.generate(_ayahs.length, (_) => GlobalKey()));
+
+        _bookmarked
+          ..clear()
+          ..addAll(
+            bookmarks
+                .where((e) => e['surahId'] == widget.surah.id)
+                .map((e) => _key(e['ayahNumber'] as int)),
+          );
+
+        _loading = false;
+        _error = null;
+        _highlightAyah = widget.initialAyah;
+      });
+
+      if (widget.initialAyah != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          final targetIndex = _ayahs.indexWhere(
+            (ayah) => ayah['number'] == widget.initialAyah,
+          );
+
+          if (targetIndex >= 0) {
+            Scrollable.ensureVisible(
+              _ayahKeys[targetIndex].currentContext!,
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              alignment: 0.12,
+            );
+
+            Future.delayed(const Duration(seconds: 3), () {
+              if (mounted) {
+                setState(() => _highlightAyah = null);
+              }
+            });
+          }
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  Map<String, dynamic> _bookmarkData(Map<String, dynamic> ayah) {
+    return {
+      'surahId': widget.surah.id,
+      'surahBangla': widget.surah.banglaName,
+      'surahArabic': widget.surah.arabicName,
+      'surahEnglish': widget.surah.englishName,
+      'totalAyah': widget.surah.totalAyah,
+      'ayahNumber': ayah['number'],
+      'arabicText': ayah['arabicText'],
+      'banglaText': ayah['banglaText'],
+    };
+  }
+
+  String _shareText(Map<String, dynamic> ayah) {
+    return 'সূরা ${widget.surah.banglaName} • আয়াত ${ayah['number']}\n\n'
+        '${ayah['arabicText']}\n\n'
+        '${ayah['banglaText']}\n\n'
+        '— সিরাজুম মুনির';
+  }
+
+  Future<void> _toggleBookmark(Map<String, dynamic> ayah) async {
+    final number = ayah['number'] as int;
+    final saved = await _bookmarkService.toggle(_bookmarkData(ayah));
+
+    if (!mounted) return;
+
+    setState(() {
+      saved ? _bookmarked.add(_key(number)) : _bookmarked.remove(_key(number));
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(saved ? 'বুকমার্ক সংরক্ষণ করা হয়েছে' : 'বুকমার্ক সরানো হয়েছে'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _copyAyah(Map<String, dynamic> ayah) async {
+    await Clipboard.setData(
+      ClipboardData(text: _shareText(ayah)),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('আয়াত কপি করা হয়েছে'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _shareAyah(Map<String, dynamic> ayah) async {
+    await SharePlus.instance.share(
+      ShareParams(text: _shareText(ayah)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A8754),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.surah.banglaName,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              '${widget.surah.arabicName} • ${widget.surah.englishName}',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      'কুরআনের তথ্য লোড করা যায়নি।\n\n$_error',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : _ayahs.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'এই সূরার কোনো আয়াত পাওয়া যায়নি।',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                        bottom: 20,
+                      ),
+                      itemCount: _ayahs.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return Container(
+                            margin: const EdgeInsets.fromLTRB(12, 2, 12, 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0A8754).withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFF0A8754).withValues(alpha: 0.10),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.menu_book_outlined,
+                                  color: Color(0xFF0A8754),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    '${widget.surah.totalAyah} আয়াত • ${widget.surah.englishName}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        final ayah = _ayahs[index - 1];
+                        final number = ayah['number'] as int;
+
+                        return Container(
+                          key: _ayahKeys[index - 1],
+                          decoration: _highlightAyah == number
+                              ? BoxDecoration(
+                                  color: const Color(0xFF0A8754).withValues(alpha: 0.10),
+                                  borderRadius: BorderRadius.circular(20),
+                                )
+                              : null,
+                          child: AyahCard(
+                            ayahNumber: number,
+                          arabicText: ayah['arabicText'] as String? ?? '',
+                          banglaText: ayah['banglaText'] as String? ?? '',
+                          isBookmarked: _bookmarked.contains(_key(number)),
+                          onBookmark: () => _toggleBookmark(ayah),
+                          onCopy: () => _copyAyah(ayah),
+                            onShare: () => _shareAyah(ayah),
+                          ),
+                        );
+                      },
+                    ),
+    );
+  }
+}

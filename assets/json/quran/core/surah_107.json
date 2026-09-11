@@ -1,0 +1,51 @@
+{
+  "surahNumber": 107,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 7,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "أَرَءَيۡتَ ٱلَّذِي يُكَذِّبُ بِٱلدِّينِ",
+      "banglaText": "আপনি কি দেখেছেন তাকে, যে বিচারদিবসকে মিথ্যা বলে",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "فَذَٰلِكَ ٱلَّذِي يَدُعُّ ٱلۡيَتِيمَ",
+      "banglaText": "সে সেই ব্যক্তি, যে এতীমকে গলা ধাক্কা দেয়",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "وَلَا يَحُضُّ عَلَىٰ طَعَامِ ٱلۡمِسۡكِينِ",
+      "banglaText": "এবং মিসকীনকে অন্ন দিতে উৎসাহিত করে না।",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "فَوَيۡلٞ لِّلۡمُصَلِّينَ",
+      "banglaText": "অতএব দুর্ভোগ সেসব নামাযীর",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "ٱلَّذِينَ هُمۡ عَن صَلَاتِهِمۡ سَاهُونَ",
+      "banglaText": "যারা তাদের নামায সম্বন্ধে বে-খবর",
+      "englishText": ""
+    },
+    {
+      "number": 6,
+      "arabicText": "ٱلَّذِينَ هُمۡ يُرَآءُونَ",
+      "banglaText": "যারা তা লোক-দেখানোর জন্য করে",
+      "englishText": ""
+    },
+    {
+      "number": 7,
+      "arabicText": "وَيَمۡنَعُونَ ٱلۡمَاعُونَ",
+      "banglaText": "এবং নিত্য ব্যবহার্য্য বস্তু অন্যকে দেয় না।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

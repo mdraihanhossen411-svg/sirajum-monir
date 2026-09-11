@@ -1,0 +1,57 @@
+{
+  "surahNumber": 94,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 8,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "أَلَمۡ نَشۡرَحۡ لَكَ صَدۡرَكَ",
+      "banglaText": "আমি কি আপনার বক্ষ উম্মুক্ত করে দেইনি",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "وَوَضَعۡنَا عَنكَ وِزۡرَكَ",
+      "banglaText": "আমি লাঘব করেছি আপনার বোঝা",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "ٱلَّذِيٓ أَنقَضَ ظَهۡرَكَ",
+      "banglaText": "যা ছিল আপনার জন্যে অতিশয় দুঃসহ।",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "وَرَفَعۡنَا لَكَ ذِكۡرَكَ",
+      "banglaText": "আমি আপনার আলোচনাকে সমুচ্চ করেছি।",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "فَإِنَّ مَعَ ٱلۡعُسۡرِ يُسۡرًا",
+      "banglaText": "নিশ্চয় কষ্টের সাথে স্বস্তি রয়েছে।",
+      "englishText": ""
+    },
+    {
+      "number": 6,
+      "arabicText": "إِنَّ مَعَ ٱلۡعُسۡرِ يُسۡرٗا",
+      "banglaText": "নিশ্চয় কষ্টের সাথে স্বস্তি রয়েছে।",
+      "englishText": ""
+    },
+    {
+      "number": 7,
+      "arabicText": "فَإِذَا فَرَغۡتَ فَٱنصَبۡ",
+      "banglaText": "অতএব, যখন অবসর পান পরিশ্রম করুন।",
+      "englishText": ""
+    },
+    {
+      "number": 8,
+      "arabicText": "وَإِلَىٰ رَبِّكَ فَٱرۡغَب",
+      "banglaText": "এবং আপনার পালনকর্তার প্রতি মনোনিবেশ করুন।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

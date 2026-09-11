@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+
+class BookmarkPage extends StatefulWidget {
+  const BookmarkPage({super.key});
+
+  @override
+  State<BookmarkPage> createState() => _BookmarkPageState();
+}
+
+class _BookmarkPageState extends State<BookmarkPage> {
+  final List<Map<String, String>> bookmarks = [
+    {
+      "surah": "সূরা আল-ফাতিহা",
+      "ayah": "আয়াত ১",
+    },
+    {
+      "surah": "সূরা আল-বাকারা",
+      "ayah": "আয়াত ২৫৫ (আয়াতুল কুরসি)",
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return bookmarks.isEmpty
+        ? const Center(
+      child: Text(
+        "কোন বুকমার্ক সংরক্ষিত নেই",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    )
+        : ListView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: bookmarks.length,
+      itemBuilder: (context, index) {
+        return Card(
+          elevation: 3,
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: ListTile(
+            leading: const CircleAvatar(
+              backgroundColor: Color(0xFF0A8754),
+              child: Icon(
+                Icons.bookmark,
+                color: Colors.white,
+              ),
+            ),
+            title: Text(
+              bookmarks[index]["surah"]!,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              bookmarks[index]["ayah"]!,
+            ),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                setState(() {
+                  bookmarks.removeAt(index);
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("বুকমার্ক মুছে ফেলা হয়েছে"),
+                  ),
+                );
+              },
+            ),
+            onTap: () {
+              // পরে Surah Detail Page-এ যাবে
+            },
+          ),
+        );
+      },
+    );
+  }
+}

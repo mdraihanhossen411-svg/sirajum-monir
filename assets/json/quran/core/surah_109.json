@@ -1,0 +1,45 @@
+{
+  "surahNumber": 109,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 6,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "قُلۡ يَـٰٓأَيُّهَا ٱلۡكَٰفِرُونَ",
+      "banglaText": "বলুন, হে কাফেরকূল",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "لَآ أَعۡبُدُ مَا تَعۡبُدُونَ",
+      "banglaText": "আমি এবাদত করিনা, তোমরা যার এবাদত কর।",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "وَلَآ أَنتُمۡ عَٰبِدُونَ مَآ أَعۡبُدُ",
+      "banglaText": "এবং তোমরাও এবাদতকারী নও, যার এবাদত আমি করি",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "وَلَآ أَنَا۠ عَابِدٞ مَّا عَبَدتُّمۡ",
+      "banglaText": "এবং আমি এবাদতকারী নই, যার এবাদত তোমরা কর।",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "وَلَآ أَنتُمۡ عَٰبِدُونَ مَآ أَعۡبُدُ",
+      "banglaText": "তোমরা এবাদতকারী নও, যার এবাদত আমি করি।",
+      "englishText": ""
+    },
+    {
+      "number": 6,
+      "arabicText": "لَكُمۡ دِينُكُمۡ وَلِيَ دِينِ",
+      "banglaText": "তোমাদের কর্ম ও কর্মফল তোমাদের জন্যে এবং আমার কর্ম ও কর্মফল আমার জন্যে।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

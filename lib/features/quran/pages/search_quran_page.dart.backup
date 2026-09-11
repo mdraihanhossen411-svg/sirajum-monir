@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+
+class SearchQuranPage extends StatefulWidget {
+  const SearchQuranPage({super.key});
+
+  @override
+  State<SearchQuranPage> createState() => _SearchQuranPageState();
+}
+
+class _SearchQuranPageState extends State<SearchQuranPage> {
+  final TextEditingController _searchController =
+  TextEditingController();
+
+  final List<Map<String, String>> _allData = [
+    {
+      "surah": "সূরা আল-ফাতিহা",
+      "ayah": "১",
+      "text": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
+    },
+    {
+      "surah": "সূরা আল-বাকারা",
+      "ayah": "২৫৫",
+      "text": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ"
+    },
+  ];
+
+  List<Map<String, String>> _results = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _results = _allData;
+  }
+
+  void _search(String value) {
+    setState(() {
+      if (value.isEmpty) {
+        _results = _allData;
+      } else {
+        _results = _allData.where((item) {
+          return item["surah"]!
+              .toLowerCase()
+              .contains(value.toLowerCase()) ||
+              item["text"]!
+                  .toLowerCase()
+                  .contains(value.toLowerCase()) ||
+              item["ayah"]!
+                  .contains(value);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _search,
+            decoration: InputDecoration(
+              hintText: "সূরা বা আয়াত খুঁজুন...",
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        ),
+
+        Expanded(
+          child: _results.isEmpty
+              ? const Center(
+            child: Text(
+              "কোন ফলাফল পাওয়া যায়নি",
+              style: TextStyle(fontSize: 18),
+            ),
+          )
+              : ListView.builder(
+            itemCount: _results.length,
+            itemBuilder: (context, index) {
+              return Card(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.menu_book,
+                    color: Color(0xFF0A8754),
+                  ),
+                  title: Text(
+                    _results[index]["surah"]!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    "আয়াত ${_results[index]["ayah"]}\n${_results[index]["text"]}",
+                  ),
+                  isThreeLine: true,
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                  ),
+                  onTap: () {
+                    // পরে Surah Detail Page-এ যাবে
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}

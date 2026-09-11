@@ -1,0 +1,39 @@
+{
+  "surahNumber": 113,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 5,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "قُلۡ أَعُوذُ بِرَبِّ ٱلۡفَلَقِ",
+      "banglaText": "বলুন, আমি আশ্রয় গ্রহণ করছি প্রভাতের পালনকর্তার",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "مِن شَرِّ مَا خَلَقَ",
+      "banglaText": "তিনি যা সৃষ্টি করেছেন, তার অনিষ্ট থেকে",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+      "banglaText": "অন্ধকার রাত্রির অনিষ্ট থেকে, যখন তা সমাগত হয়",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "وَمِن شَرِّ ٱلنَّفَّـٰثَٰتِ فِي ٱلۡعُقَدِ",
+      "banglaText": "গ্রন্থিতে ফুঁৎকার দিয়ে জাদুকারিনীদের অনিষ্ট থেকে",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+      "banglaText": "এবং হিংসুকের অনিষ্ট থেকে যখন সে হিংসা করে।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

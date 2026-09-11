@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+
+class AyahCard extends StatelessWidget {
+  final int ayahNumber;
+  final String arabicText;
+  final String banglaText;
+  final String? englishText;
+  final bool isBookmarked;
+  final VoidCallback? onBookmark;
+  final VoidCallback? onCopy;
+  final VoidCallback? onPlayAudio;
+  final VoidCallback? onShare;
+
+  const AyahCard({
+    super.key,
+    required this.ayahNumber,
+    required this.arabicText,
+    required this.banglaText,
+    this.englishText,
+    this.isBookmarked = false,
+    this.onBookmark,
+    this.onCopy,
+    this.onPlayAudio,
+    this.onShare,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: const Color(0xFF0A8754),
+                  child: Text(
+                    '$ayahNumber',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                if (onBookmark != null)
+                  IconButton(
+                    tooltip: 'বুকমার্ক',
+                    icon: Icon(
+                      isBookmarked
+                          ? Icons.bookmark
+                          : Icons.bookmark_border,
+                    ),
+                    onPressed: onBookmark,
+                  ),
+                if (onCopy != null)
+                  IconButton(
+                    tooltip: 'কপি',
+                    icon: const Icon(Icons.copy_outlined),
+                    onPressed: onCopy,
+                  ),
+                if (onPlayAudio != null)
+                  IconButton(
+                    tooltip: 'অডিও',
+                    icon: const Icon(Icons.volume_up),
+                    onPressed: onPlayAudio,
+                  ),
+                if (onShare != null)
+                  IconButton(
+                    tooltip: 'শেয়ার',
+                    icon: const Icon(Icons.share_outlined),
+                    onPressed: onShare,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                arabicText,
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                style: const TextStyle(
+                  fontSize: 28,
+                  height: 2,
+                  fontFamily: 'Amiri',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              banglaText,
+              style: const TextStyle(
+                fontSize: 17,
+                height: 1.8,
+              ),
+            ),
+            if (englishText != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                englishText!,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 15,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

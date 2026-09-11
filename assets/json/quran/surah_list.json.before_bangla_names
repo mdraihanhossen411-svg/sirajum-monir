@@ -1,0 +1,914 @@
+[
+  {
+    "id": 1,
+    "arabicName": "الفاتحة",
+    "englishName": "Al-Fatihah",
+    "banglaName": "আল-ফাতিহা",
+    "totalAyah": 7,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 2,
+    "arabicName": "البقرة",
+    "englishName": "Al-Baqarah",
+    "banglaName": "আল-বাকারা",
+    "totalAyah": 286,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 3,
+    "arabicName": "آل عمران",
+    "englishName": "Ali Imran",
+    "banglaName": "আলে ইমরান",
+    "totalAyah": 200,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 4,
+    "arabicName": "النساء",
+    "englishName": "An-Nisa",
+    "banglaName": "আন-নিসা",
+    "totalAyah": 176,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 5,
+    "arabicName": "المائدة",
+    "englishName": "Al-Maidah",
+    "banglaName": "আল-মায়িদাহ",
+    "totalAyah": 120,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 6,
+    "arabicName": "الأنعام",
+    "englishName": "Al-Anam",
+    "banglaName": "আল-আনআম",
+    "totalAyah": 165,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 7,
+    "arabicName": "الأعراف",
+    "englishName": "Al-Araf",
+    "banglaName": "আল-আরাফ",
+    "totalAyah": 206,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 8,
+    "arabicName": "الأنفال",
+    "englishName": "Al-Anfal",
+    "banglaName": "আল-আনফাল",
+    "totalAyah": 75,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 9,
+    "arabicName": "التوبة",
+    "englishName": "At-Tawbah",
+    "banglaName": "আত-তাওবাহ",
+    "totalAyah": 129,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 10,
+    "arabicName": "يونس",
+    "englishName": "Yunus",
+    "banglaName": "ইউনুস",
+    "totalAyah": 109,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 11,
+    "arabicName": "هود",
+    "englishName": "Hud",
+    "banglaName": "হুদ",
+    "totalAyah": 123,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 12,
+    "arabicName": "يوسف",
+    "englishName": "Yusuf",
+    "banglaName": "ইউসুফ",
+    "totalAyah": 111,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 13,
+    "arabicName": "الرعد",
+    "englishName": "Ar-Rad",
+    "banglaName": "আর-রাদ",
+    "totalAyah": 43,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 14,
+    "arabicName": "إبراهيم",
+    "englishName": "Ibrahim",
+    "banglaName": "ইবরাহিম",
+    "totalAyah": 52,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 15,
+    "arabicName": "الحجر",
+    "englishName": "Al-Hijr",
+    "banglaName": "আল-হিজর",
+    "totalAyah": 99,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 16,
+    "arabicName": "النحل",
+    "englishName": "An-Nahl",
+    "banglaName": "আন-নাহল",
+    "totalAyah": 128,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 17,
+    "arabicName": "الإسراء",
+    "englishName": "Al-Isra",
+    "banglaName": "আল-ইসরা",
+    "totalAyah": 111,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 18,
+    "arabicName": "الكهف",
+    "englishName": "Al-Kahf",
+    "banglaName": "আল-কাহফ",
+    "totalAyah": 110,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 19,
+    "arabicName": "مريم",
+    "englishName": "Maryam",
+    "banglaName": "মারইয়াম",
+    "totalAyah": 98,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 20,
+    "arabicName": "طه",
+    "englishName": "Ta-Ha",
+    "banglaName": "ত্বা-হা",
+    "totalAyah": 135,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 21,
+    "arabicName": "الأنبياء",
+    "englishName": "Al-Anbiya",
+    "banglaName": "আল-আম্বিয়া",
+    "totalAyah": 112,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 22,
+    "arabicName": "الحج",
+    "englishName": "Al-Hajj",
+    "banglaName": "আল-হাজ্জ",
+    "totalAyah": 78,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 23,
+    "arabicName": "المؤمنون",
+    "englishName": "Al-Muminun",
+    "banglaName": "আল-মুমিনুন",
+    "totalAyah": 118,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 24,
+    "arabicName": "النور",
+    "englishName": "An-Nur",
+    "banglaName": "আন-নূর",
+    "totalAyah": 64,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 25,
+    "arabicName": "الفرقان",
+    "englishName": "Al-Furqan",
+    "banglaName": "আল-ফুরকান",
+    "totalAyah": 77,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 26,
+    "arabicName": "الشعراء",
+    "englishName": "Ash-Shuara",
+    "banglaName": "আশ-শুআরা",
+    "totalAyah": 227,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 27,
+    "arabicName": "النمل",
+    "englishName": "An-Naml",
+    "banglaName": "আন-নামল",
+    "totalAyah": 93,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 28,
+    "arabicName": "القصص",
+    "englishName": "Al-Qasas",
+    "banglaName": "আল-কাসাস",
+    "totalAyah": 88,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 29,
+    "arabicName": "العنكبوت",
+    "englishName": "Al-Ankabut",
+    "banglaName": "আল-আনকাবুত",
+    "totalAyah": 69,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 30,
+    "arabicName": "الروم",
+    "englishName": "Ar-Rum",
+    "banglaName": "আর-রূম",
+    "totalAyah": 60,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 31,
+    "arabicName": "لقمان",
+    "englishName": "Luqman",
+    "banglaName": "লুকমান",
+    "totalAyah": 34,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 32,
+    "arabicName": "السجدة",
+    "englishName": "As-Sajdah",
+    "banglaName": "আস-সাজদাহ",
+    "totalAyah": 30,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 33,
+    "arabicName": "الأحزاب",
+    "englishName": "Al-Ahzab",
+    "banglaName": "আল-আহযাব",
+    "totalAyah": 73,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 34,
+    "arabicName": "سبإ",
+    "englishName": "Saba",
+    "banglaName": "সাবা",
+    "totalAyah": 54,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 35,
+    "arabicName": "فاطر",
+    "englishName": "Fatir",
+    "banglaName": "ফাতির",
+    "totalAyah": 45,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 36,
+    "arabicName": "يس",
+    "englishName": "Ya-Sin",
+    "banglaName": "ইয়াসিন",
+    "totalAyah": 83,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 37,
+    "arabicName": "الصافات",
+    "englishName": "As-Saffat",
+    "banglaName": "আস-সাফফাত",
+    "totalAyah": 182,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 38,
+    "arabicName": "ص",
+    "englishName": "Sad",
+    "banglaName": "সাদ",
+    "totalAyah": 88,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 39,
+    "arabicName": "الزمر",
+    "englishName": "Az-Zumar",
+    "banglaName": "আয-যুমার",
+    "totalAyah": 75,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 40,
+    "arabicName": "غافر",
+    "englishName": "Ghafir",
+    "banglaName": "গাফির",
+    "totalAyah": 85,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 41,
+    "arabicName": "فصلت",
+    "englishName": "Fussilat",
+    "banglaName": "ফুসসিলাত",
+    "totalAyah": 54,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 42,
+    "arabicName": "الشورى",
+    "englishName": "Ash-Shura",
+    "banglaName": "আশ-শূরা",
+    "totalAyah": 53,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 43,
+    "arabicName": "الزخرف",
+    "englishName": "Az-Zukhruf",
+    "banglaName": "আয-যুখরুফ",
+    "totalAyah": 89,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 44,
+    "arabicName": "الدخان",
+    "englishName": "Ad-Dukhan",
+    "banglaName": "আদ-দুখান",
+    "totalAyah": 59,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 45,
+    "arabicName": "الجاثية",
+    "englishName": "Al-Jathiyah",
+    "banglaName": "আল-জাসিয়াহ",
+    "totalAyah": 37,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 46,
+    "arabicName": "الأحقاف",
+    "englishName": "Al-Ahqaf",
+    "banglaName": "আল-আহকাফ",
+    "totalAyah": 35,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 47,
+    "arabicName": "محمد",
+    "englishName": "Muhammad",
+    "banglaName": "মুহাম্মাদ",
+    "totalAyah": 38,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 48,
+    "arabicName": "الفتح",
+    "englishName": "Al-Fath",
+    "banglaName": "আল-ফাতহ",
+    "totalAyah": 29,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 49,
+    "arabicName": "الحجرات",
+    "englishName": "Al-Hujurat",
+    "banglaName": "আল-হুজুরাত",
+    "totalAyah": 18,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 50,
+    "arabicName": "ق",
+    "englishName": "Qaf",
+    "banglaName": "কাফ",
+    "totalAyah": 45,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 51,
+    "arabicName": "الذاريات",
+    "englishName": "Adh-Dhariyat",
+    "banglaName": "আয-যারিয়াত",
+    "totalAyah": 60,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 52,
+    "arabicName": "الطور",
+    "englishName": "At-Tur",
+    "banglaName": "আত-তূর",
+    "totalAyah": 49,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 53,
+    "arabicName": "النجم",
+    "englishName": "An-Najm",
+    "banglaName": "আন-নাজম",
+    "totalAyah": 62,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 54,
+    "arabicName": "القمر",
+    "englishName": "Al-Qamar",
+    "banglaName": "আল-কামার",
+    "totalAyah": 55,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 55,
+    "arabicName": "الرحمن",
+    "englishName": "Ar-Rahman",
+    "banglaName": "আর-রহমান",
+    "totalAyah": 78,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 56,
+    "arabicName": "الواقعة",
+    "englishName": "Al-Waqiah",
+    "banglaName": "আল-ওয়াকিয়াহ",
+    "totalAyah": 96,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 57,
+    "arabicName": "الحديد",
+    "englishName": "Al-Hadid",
+    "banglaName": "আল-হাদীদ",
+    "totalAyah": 29,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 58,
+    "arabicName": "المجادلة",
+    "englishName": "Al-Mujadilah",
+    "banglaName": "আল-মুজাদালাহ",
+    "totalAyah": 22,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 59,
+    "arabicName": "الحشر",
+    "englishName": "Al-Hashr",
+    "banglaName": "আল-হাশর",
+    "totalAyah": 24,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 60,
+    "arabicName": "الممتحنة",
+    "englishName": "Al-Mumtahanah",
+    "banglaName": "আল-মুমতাহিনাহ",
+    "totalAyah": 13,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 61,
+    "arabicName": "الصف",
+    "englishName": "As-Saff",
+    "banglaName": "আস-সাফ",
+    "totalAyah": 14,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 62,
+    "arabicName": "الجمعة",
+    "englishName": "Al-Jumuah",
+    "banglaName": "আল-জুমুআহ",
+    "totalAyah": 11,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 63,
+    "arabicName": "المنافقون",
+    "englishName": "Al-Munafiqun",
+    "banglaName": "আল-মুনাফিকুন",
+    "totalAyah": 11,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 64,
+    "arabicName": "التغابن",
+    "englishName": "At-Taghabun",
+    "banglaName": "আত-তাগাবুন",
+    "totalAyah": 18,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 65,
+    "arabicName": "الطلاق",
+    "englishName": "At-Talaq",
+    "banglaName": "আত-তালাক",
+    "totalAyah": 12,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 66,
+    "arabicName": "التحريم",
+    "englishName": "At-Tahrim",
+    "banglaName": "আত-তাহরীম",
+    "totalAyah": 12,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 67,
+    "arabicName": "الملك",
+    "englishName": "Al-Mulk",
+    "banglaName": "আল-মুলক",
+    "totalAyah": 30,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 68,
+    "arabicName": "القلم",
+    "englishName": "Al-Qalam",
+    "banglaName": "আল-কলম",
+    "totalAyah": 52,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 69,
+    "arabicName": "الحاقة",
+    "englishName": "Al-Haqqah",
+    "banglaName": "আল-হাক্কাহ",
+    "totalAyah": 52,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 70,
+    "arabicName": "المعارج",
+    "englishName": "Al-Maarij",
+    "banglaName": "আল-মাআরিজ",
+    "totalAyah": 44,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 71,
+    "arabicName": "نوح",
+    "englishName": "Nuh",
+    "banglaName": "নূহ",
+    "totalAyah": 28,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 72,
+    "arabicName": "الجن",
+    "englishName": "Al-Jinn",
+    "banglaName": "আল-জিন",
+    "totalAyah": 28,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 73,
+    "arabicName": "المزمل",
+    "englishName": "Al-Muzzammil",
+    "banglaName": "আল-মুযযাম্মিল",
+    "totalAyah": 20,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 74,
+    "arabicName": "المدثر",
+    "englishName": "Al-Muddaththir",
+    "banglaName": "আল-মুদ্দাসসির",
+    "totalAyah": 56,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 75,
+    "arabicName": "القيامة",
+    "englishName": "Al-Qiyamah",
+    "banglaName": "আল-কিয়ামাহ",
+    "totalAyah": 40,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 76,
+    "arabicName": "الإنسان",
+    "englishName": "Al-Insan",
+    "banglaName": "আল-ইনসান",
+    "totalAyah": 31,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 77,
+    "arabicName": "المرسلات",
+    "englishName": "Al-Mursalat",
+    "banglaName": "আল-মুরসালাত",
+    "totalAyah": 50,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 78,
+    "arabicName": "النبأ",
+    "englishName": "An-Naba",
+    "banglaName": "আন-নাবা",
+    "totalAyah": 40,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 79,
+    "arabicName": "النازعات",
+    "englishName": "An-Naziat",
+    "banglaName": "আন-নাযিআত",
+    "totalAyah": 46,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 80,
+    "arabicName": "عبس",
+    "englishName": "Abasa",
+    "banglaName": "আবাসা",
+    "totalAyah": 42,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 81,
+    "arabicName": "التكوير",
+    "englishName": "At-Takwir",
+    "banglaName": "আত-তাকভীর",
+    "totalAyah": 29,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 82,
+    "arabicName": "الانفطار",
+    "englishName": "Al-Infitar",
+    "banglaName": "আল-ইনফিতার",
+    "totalAyah": 19,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 83,
+    "arabicName": "المطففين",
+    "englishName": "Al-Mutaffifin",
+    "banglaName": "আল-মুতাফফিফীন",
+    "totalAyah": 36,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 84,
+    "arabicName": "الانشقاق",
+    "englishName": "Al-Inshiqaq",
+    "banglaName": "আল-ইনশিকাক",
+    "totalAyah": 25,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 85,
+    "arabicName": "البروج",
+    "englishName": "Al-Buruj",
+    "banglaName": "আল-বুরুজ",
+    "totalAyah": 22,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 86,
+    "arabicName": "الطارق",
+    "englishName": "At-Tariq",
+    "banglaName": "আত-তারিক",
+    "totalAyah": 17,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 87,
+    "arabicName": "الأعلى",
+    "englishName": "Al-Ala",
+    "banglaName": "আল-আলা",
+    "totalAyah": 19,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 88,
+    "arabicName": "الغاشية",
+    "englishName": "Al-Ghashiyah",
+    "banglaName": "আল-গাশিয়াহ",
+    "totalAyah": 26,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 89,
+    "arabicName": "الفجر",
+    "englishName": "Al-Fajr",
+    "banglaName": "আল-ফজর",
+    "totalAyah": 30,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 90,
+    "arabicName": "البلد",
+    "englishName": "Al-Balad",
+    "banglaName": "আল-বালাদ",
+    "totalAyah": 20,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 91,
+    "arabicName": "الشمس",
+    "englishName": "Ash-Shams",
+    "banglaName": "আশ-শামস",
+    "totalAyah": 15,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 92,
+    "arabicName": "الليل",
+    "englishName": "Al-Layl",
+    "banglaName": "আল-লাইল",
+    "totalAyah": 21,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 93,
+    "arabicName": "الضحى",
+    "englishName": "Ad-Duha",
+    "banglaName": "আদ-দুহা",
+    "totalAyah": 11,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 94,
+    "arabicName": "الشرح",
+    "englishName": "Ash-Sharh",
+    "banglaName": "আশ-শরহ",
+    "totalAyah": 8,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 95,
+    "arabicName": "التين",
+    "englishName": "At-Tin",
+    "banglaName": "আত-তীন",
+    "totalAyah": 8,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 96,
+    "arabicName": "العلق",
+    "englishName": "Al-Alaq",
+    "banglaName": "আল-আলাক",
+    "totalAyah": 19,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 97,
+    "arabicName": "القدر",
+    "englishName": "Al-Qadr",
+    "banglaName": "আল-কদর",
+    "totalAyah": 5,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 98,
+    "arabicName": "البينة",
+    "englishName": "Al-Bayyinah",
+    "banglaName": "আল-বাইয়্যিনাহ",
+    "totalAyah": 8,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 99,
+    "arabicName": "الزلزلة",
+    "englishName": "Az-Zalzalah",
+    "banglaName": "আয-যিলযাল",
+    "totalAyah": 8,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 100,
+    "arabicName": "العاديات",
+    "englishName": "Al-Adiyat",
+    "banglaName": "আল-আদিয়াত",
+    "totalAyah": 11,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 101,
+    "arabicName": "القارعة",
+    "englishName": "Al-Qariah",
+    "banglaName": "আল-কারিয়াহ",
+    "totalAyah": 11,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 102,
+    "arabicName": "التكاثر",
+    "englishName": "At-Takathur",
+    "banglaName": "আত-তাকাসুর",
+    "totalAyah": 8,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 103,
+    "arabicName": "العصر",
+    "englishName": "Al-Asr",
+    "banglaName": "আল-আসর",
+    "totalAyah": 3,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 104,
+    "arabicName": "الهمزة",
+    "englishName": "Al-Humazah",
+    "banglaName": "আল-হুমাযাহ",
+    "totalAyah": 9,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 105,
+    "arabicName": "الفيل",
+    "englishName": "Al-Fil",
+    "banglaName": "আল-ফীল",
+    "totalAyah": 5,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 106,
+    "arabicName": "قريش",
+    "englishName": "Quraysh",
+    "banglaName": "কুরাইশ",
+    "totalAyah": 4,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 107,
+    "arabicName": "الماعون",
+    "englishName": "Al-Maun",
+    "banglaName": "আল-মাউন",
+    "totalAyah": 7,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 108,
+    "arabicName": "الكوثر",
+    "englishName": "Al-Kawthar",
+    "banglaName": "আল-কাওসার",
+    "totalAyah": 3,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 109,
+    "arabicName": "الكافرون",
+    "englishName": "Al-Kafirun",
+    "banglaName": "আল-কাফিরুন",
+    "totalAyah": 6,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 110,
+    "arabicName": "النصر",
+    "englishName": "An-Nasr",
+    "banglaName": "আন-নাসর",
+    "totalAyah": 3,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 111,
+    "arabicName": "المسد",
+    "englishName": "Al-Masad",
+    "banglaName": "আল-মাসাদ",
+    "totalAyah": 5,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 112,
+    "arabicName": "الإخلاص",
+    "englishName": "Al-Ikhlas",
+    "banglaName": "আল-ইখলাস",
+    "totalAyah": 4,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 113,
+    "arabicName": "الفلق",
+    "englishName": "Al-Falaq",
+    "banglaName": "আল-ফালাক",
+    "totalAyah": 5,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 114,
+    "arabicName": "الناس",
+    "englishName": "An-Nas",
+    "banglaName": "আন-নাস",
+    "totalAyah": 6,
+    "revelationType": "মাক্কী"
+  }
+]

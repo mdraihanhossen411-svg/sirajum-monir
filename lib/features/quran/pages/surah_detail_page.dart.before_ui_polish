@@ -1,0 +1,179 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
+import '../models/quran_model.dart';
+import '../services/bookmark_service.dart';
+import '../widgets/ayah_card.dart';
+
+class SurahDetailPage extends StatefulWidget {
+  final SurahModel surah;
+
+  const SurahDetailPage({
+    super.key,
+    required this.surah,
+  });
+
+  @override
+  State<SurahDetailPage> createState() => _SurahDetailPageState();
+}
+
+class _SurahDetailPageState extends State<SurahDetailPage> {
+  final BookmarkService _bookmarkService = BookmarkService();
+
+  List<Map<String, dynamic>> _ayahs = [];
+  final Set<String> _bookmarked = {};
+  bool _loading = true;
+  String? _error;
+
+  String _key(int ayah) => '${widget.surah.id}:$ayah';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final jsonString = await rootBundle.loadString(
+        'assets/json/quran/core/surah_${widget.surah.id}.json',
+      );
+      final data = json.decode(jsonString) as Map<String, dynamic>;
+      final rawAyahs = data['ayahs'] as List<dynamic>? ?? [];
+      final bookmarks = await _bookmarkService.load();
+
+      if (!mounted) return;
+
+      setState(() {
+        _ayahs = rawAyahs
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+
+        _bookmarked
+          ..clear()
+          ..addAll(
+            bookmarks
+                .where((e) => e['surahId'] == widget.surah.id)
+                .map((e) => _key(e['ayahNumber'] as int)),
+          );
+
+        _loading = false;
+        _error = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  Map<String, dynamic> _bookmarkData(Map<String, dynamic> ayah) {
+    return {
+      'surahId': widget.surah.id,
+      'surahBangla': widget.surah.banglaName,
+      'surahArabic': widget.surah.arabicName,
+      'surahEnglish': widget.surah.englishName,
+      'totalAyah': widget.surah.totalAyah,
+      'ayahNumber': ayah['number'],
+      'arabicText': ayah['arabicText'],
+      'banglaText': ayah['banglaText'],
+    };
+  }
+
+  String _shareText(Map<String, dynamic> ayah) {
+    return 'সূরা ${widget.surah.banglaName} • আয়াত ${ayah['number']}\n\n'
+        '${ayah['arabicText']}\n\n'
+        '${ayah['banglaText']}\n\n'
+        '— সিরাজুম মুনির';
+  }
+
+  Future<void> _toggleBookmark(Map<String, dynamic> ayah) async {
+    final number = ayah['number'] as int;
+    final saved = await _bookmarkService.toggle(_bookmarkData(ayah));
+
+    if (!mounted) return;
+
+    setState(() {
+      saved ? _bookmarked.add(_key(number)) : _bookmarked.remove(_key(number));
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(saved ? 'বুকমার্ক সংরক্ষণ করা হয়েছে' : 'বুকমার্ক সরানো হয়েছে'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _copyAyah(Map<String, dynamic> ayah) async {
+    await Clipboard.setData(
+      ClipboardData(text: _shareText(ayah)),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('আয়াত কপি করা হয়েছে'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _shareAyah(Map<String, dynamic> ayah) async {
+    await SharePlus.instance.share(
+      ShareParams(text: _shareText(ayah)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.surah.banglaName),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF0A8754),
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      'কুরআনের তথ্য লোড করা যায়নি।\n\n$_error',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : _ayahs.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'এই সূরার কোনো আয়াত পাওয়া যায়নি।',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      itemCount: _ayahs.length,
+                      itemBuilder: (context, index) {
+                        final ayah = _ayahs[index];
+                        final number = ayah['number'] as int;
+
+                        return AyahCard(
+                          ayahNumber: number,
+                          arabicText: ayah['arabicText'] as String? ?? '',
+                          banglaText: ayah['banglaText'] as String? ?? '',
+                          isBookmarked: _bookmarked.contains(_key(number)),
+                          onBookmark: () => _toggleBookmark(ayah),
+                          onCopy: () => _copyAyah(ayah),
+                          onShare: () => _shareAyah(ayah),
+                        );
+                      },
+                    ),
+    );
+  }
+}

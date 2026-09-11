@@ -1,0 +1,156 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../models/quran_model.dart';
+
+class SurahDetailPage extends StatefulWidget {
+  final SurahModel surah;
+
+  const SurahDetailPage({
+    super.key,
+    required this.surah,
+  });
+
+  @override
+  State<SurahDetailPage> createState() => _SurahDetailPageState();
+}
+
+class _SurahDetailPageState extends State<SurahDetailPage> {
+  List<Map<String, dynamic>> _ayahs = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAyahs();
+  }
+
+  Future<void> _loadAyahs() async {
+    try {
+      final jsonString = await rootBundle.loadString(
+        'assets/json/quran/core/surah_${widget.surah.id}.json',
+      );
+
+      final data = json.decode(jsonString) as Map<String, dynamic>;
+      final rawAyahs = data['ayahs'] as List<dynamic>? ?? [];
+
+      final ayahs = rawAyahs
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+
+      if (!mounted) return;
+
+      setState(() {
+        _ayahs = ayahs;
+        _loading = false;
+        _error = null;
+      });
+    } catch (e) {
+      debugPrint('Quran Core Ayah Error: $e');
+
+      if (!mounted) return;
+
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.surah.banglaName),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF0A8754),
+      ),
+      body: _loading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : _error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      'কুরআনের তথ্য লোড করা যায়নি।\n\n$_error',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : _ayahs.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'এই সূরার কোনো আয়াত পাওয়া যায়নি।',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      itemCount: _ayahs.length,
+                      itemBuilder: (context, index) {
+                        final ayah = _ayahs[index];
+
+                        return Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor:
+                                          const Color(0xFF0A8754),
+                                      child: Text(
+                                        '${ayah['number']}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  ayah['arabicText'] as String? ?? '',
+                                  textAlign: TextAlign.right,
+                                  textDirection: TextDirection.rtl,
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    height: 2,
+                                    fontFamily: 'Amiri',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  ayah['banglaText'] as String? ?? '',
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    height: 1.8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+    );
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "surahNumber": 111,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 5,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "تَبَّتۡ يَدَآ أَبِي لَهَبٖ وَتَبَّ",
+      "banglaText": "আবু লাহাবের হস্তদ্বয় ধ্বংস হোক এবং ধ্বংস হোক সে নিজে",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "مَآ أَغۡنَىٰ عَنۡهُ مَالُهُۥ وَمَا كَسَبَ",
+      "banglaText": "কোন কাজে আসেনি তার ধন-সম্পদ ও যা সে উপার্জন করেছে।",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "سَيَصۡلَىٰ نَارٗا ذَاتَ لَهَبٖ",
+      "banglaText": "সত্বরই সে প্রবেশ করবে লেলিহান অগ্নিতে",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "وَٱمۡرَأَتُهُۥ حَمَّالَةَ ٱلۡحَطَبِ",
+      "banglaText": "এবং তার স্ত্রীও-যে ইন্ধন বহন করে",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "فِي جِيدِهَا حَبۡلٞ مِّن مَّسَدِۭ",
+      "banglaText": "তার গলদেশে খর্জুরের রশি নিয়ে।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

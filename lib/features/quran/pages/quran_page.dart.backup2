@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+
+import '../controllers/search_controller.dart';
+import 'bookmark_page.dart';
+import 'juz_page.dart';
+import 'search_quran_page.dart';
+import 'surah_list_page.dart';
+
+class QuranPage extends StatefulWidget {
+  const QuranPage({super.key});
+
+  @override
+  State<QuranPage> createState() => _QuranPageState();
+}
+
+class _QuranPageState extends State<QuranPage> {
+  final QuranSearchController _searchController =
+      QuranSearchController();
+
+  final TextEditingController _textController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.load();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0A8754),
+          centerTitle: true,
+          title: const Text(
+            'আল-কুরআন',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(105),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    12,
+                    4,
+                    12,
+                    8,
+                  ),
+                  child: TextField(
+                    controller: _textController,
+                    onChanged: _searchController.search,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'সূরা, আয়াত বা অর্থ খুঁজুন...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: ValueListenableBuilder<
+                          TextEditingValue>(
+                        valueListenable: _textController,
+                        builder: (context, value, _) {
+                          if (value.text.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _textController.clear();
+                              _searchController.search('');
+                            },
+                          );
+                        },
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding:
+                          const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const TabBar(
+                  indicatorColor: Colors.white,
+                  tabs: [
+                    Tab(
+                      icon: Icon(Icons.menu_book),
+                      text: 'সূরা',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.book),
+                      text: 'জুয',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.bookmark),
+                      text: 'বুকমার্ক',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: AnimatedBuilder(
+          animation: _searchController,
+          builder: (context, _) {
+            if (_searchController.query.trim().isNotEmpty) {
+              return SearchQuranPage(
+                controller: _searchController,
+              );
+            }
+
+            return const TabBarView(
+              children: [
+                SurahListPage(),
+                JuzPage(),
+                BookmarkPage(),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

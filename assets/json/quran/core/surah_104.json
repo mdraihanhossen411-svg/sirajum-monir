@@ -1,0 +1,63 @@
+{
+  "surahNumber": 104,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 9,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "وَيۡلٞ لِّكُلِّ هُمَزَةٖ لُّمَزَةٍ",
+      "banglaText": "প্রত্যেক পশ্চাতে ও সম্মুখে পরনিন্দাকারীর দুর্ভোগ",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "ٱلَّذِي جَمَعَ مَالٗا وَعَدَّدَهُۥ",
+      "banglaText": "যে অর্থ সঞ্চিত করে ও গণনা করে",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "يَحۡسَبُ أَنَّ مَالَهُۥٓ أَخۡلَدَهُۥ",
+      "banglaText": "সে মনে করে যে, তার অর্থ চিরকাল তার সাথে থাকবে",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "كَلَّاۖ لَيُنۢبَذَنَّ فِي ٱلۡحُطَمَةِ",
+      "banglaText": "কখনও না, সে অবশ্যই নিক্ষিপ্ত হবে পিষ্টকারীর মধ্যে।",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "وَمَآ أَدۡرَىٰكَ مَا ٱلۡحُطَمَةُ",
+      "banglaText": "আপনি কি জানেন, পিষ্টকারী কি",
+      "englishText": ""
+    },
+    {
+      "number": 6,
+      "arabicText": "نَارُ ٱللَّهِ ٱلۡمُوقَدَةُ",
+      "banglaText": "এটা আল্লাহর প্রজ্জ্বলিত অগ্নি",
+      "englishText": ""
+    },
+    {
+      "number": 7,
+      "arabicText": "ٱلَّتِي تَطَّلِعُ عَلَى ٱلۡأَفۡـِٔدَةِ",
+      "banglaText": "যা হৃদয় পর্যন্ত পৌছবে।",
+      "englishText": ""
+    },
+    {
+      "number": 8,
+      "arabicText": "إِنَّهَا عَلَيۡهِم مُّؤۡصَدَةٞ",
+      "banglaText": "এতে তাদেরকে বেঁধে দেয়া হবে",
+      "englishText": ""
+    },
+    {
+      "number": 9,
+      "arabicText": "فِي عَمَدٖ مُّمَدَّدَةِۭ",
+      "banglaText": "লম্বা লম্বা খুঁটিতে।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

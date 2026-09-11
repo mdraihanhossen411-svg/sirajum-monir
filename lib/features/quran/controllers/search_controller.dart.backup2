@@ -1,0 +1,178 @@
+import 'package:flutter/foundation.dart';
+
+import '../models/quran_model.dart';
+import '../services/quran_service.dart';
+import 'quran_controller.dart';
+
+class QuranSearchResult {
+  final SurahModel surah;
+  final int ayahNumber;
+  final String arabicText;
+  final String banglaText;
+
+  const QuranSearchResult({
+    required this.surah,
+    required this.ayahNumber,
+    required this.arabicText,
+    required this.banglaText,
+  });
+}
+
+class QuranSearchController extends ChangeNotifier {
+  final QuranService _service = QuranService();
+
+  final List<QuranSearchResult> _allResults = [];
+  List<QuranSearchResult> _results = [];
+
+  bool _isLoading = false;
+  bool _loaded = false;
+  String? _error;
+  String _query = '';
+
+  List<QuranSearchResult> get results =>
+      List.unmodifiable(_results);
+
+  bool get isLoading => _isLoading;
+  bool get isLoaded => _loaded;
+  String? get error => _error;
+  String get query => _query;
+
+  Future<void> load() async {
+    if (_loaded || _isLoading) return;
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final coreSurahs = await _service.loadAllSurahCore();
+
+      _allResults.clear();
+
+      for (final data in coreSurahs) {
+        final surahNumber = data['surahNumber'] as int;
+
+        final surah = SurahModel(
+          id: surahNumber,
+          arabicName: data['arabicName'] as String? ?? '',
+          englishName: data['englishName'] as String? ?? '',
+          banglaName:
+              QuranController.banglaSurahName(surahNumber),
+          totalAyah: data['totalAyah'] as int? ?? 0,
+          revelationType: '',
+        );
+
+        final rawAyahs =
+            data['ayahs'] as List<dynamic>? ?? [];
+
+        for (final raw in rawAyahs) {
+          final ayah =
+              Map<String, dynamic>.from(raw as Map);
+
+          _allResults.add(
+            QuranSearchResult(
+              surah: surah,
+              ayahNumber: ayah['number'] as int? ?? 0,
+              arabicText:
+                  ayah['arabicText'] as String? ?? '',
+              banglaText:
+                  ayah['banglaText'] as String? ?? '',
+            ),
+          );
+        }
+      }
+
+      _loaded = true;
+
+      _applySearch(_query);
+    } catch (e) {
+      _error = e.toString();
+      debugPrint('Quran Search Error: $e');
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void search(String value) {
+    _query = value;
+
+    if (!_loaded) {
+      notifyListeners();
+      return;
+    }
+
+    _applySearch(value);
+    notifyListeners();
+  }
+
+  void _applySearch(String value) {
+    final query = _normalize(value);
+
+    if (query.isEmpty) {
+      _results = List.unmodifiable(_allResults);
+      return;
+    }
+
+    _results = _allResults.where((item) {
+      final surah = item.surah;
+
+      final surahId = surah.id.toString();
+      final ayahId = item.ayahNumber.toString();
+
+      return _normalize(surah.banglaName)
+              .contains(query) ||
+          _normalize(surah.arabicName)
+              .contains(query) ||
+          _normalize(surah.englishName)
+              .contains(query) ||
+          surahId == query ||
+          _toBengaliDigits(surahId) == query ||
+          ayahId == query ||
+          _toBengaliDigits(ayahId) == query ||
+          _normalize(item.arabicText)
+              .contains(query) ||
+          _normalize(item.banglaText)
+              .contains(query);
+    }).toList();
+  }
+
+  String _normalize(String value) {
+    return _normalizeDigits(value)
+        .toLowerCase()
+        .trim()
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  String _normalizeDigits(String value) {
+    const bengali = '০১২৩৪৫৬৭৮৯';
+    const english = '0123456789';
+
+    var result = value;
+
+    for (var i = 0; i < bengali.length; i++) {
+      result = result.replaceAll(
+        bengali[i],
+        english[i],
+      );
+    }
+
+    return result;
+  }
+
+  String _toBengaliDigits(String value) {
+    const english = '0123456789';
+    const bengali = '০১২৩৪৫৬৭৮৯';
+
+    var result = value;
+
+    for (var i = 0; i < english.length; i++) {
+      result = result.replaceAll(
+        english[i],
+        bengali[i],
+      );
+    }
+
+    return result;
+  }
+}

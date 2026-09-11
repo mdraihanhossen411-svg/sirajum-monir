@@ -1,0 +1,75 @@
+{
+  "surahNumber": 101,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 11,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "ٱلۡقَارِعَةُ",
+      "banglaText": "করাঘাতকারী",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "مَا ٱلۡقَارِعَةُ",
+      "banglaText": "করাঘাতকারী কি",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "وَمَآ أَدۡرَىٰكَ مَا ٱلۡقَارِعَةُ",
+      "banglaText": "করাঘাতকারী সম্পর্কে আপনি কি জানেন",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "يَوۡمَ يَكُونُ ٱلنَّاسُ كَٱلۡفَرَاشِ ٱلۡمَبۡثُوثِ",
+      "banglaText": "যেদিন মানুষ হবে বিক্ষিপ্ত পতংগের মত",
+      "englishText": ""
+    },
+    {
+      "number": 5,
+      "arabicText": "وَتَكُونُ ٱلۡجِبَالُ كَٱلۡعِهۡنِ ٱلۡمَنفُوشِ",
+      "banglaText": "এবং পর্বতমালা হবে ধুনিত রঙ্গীন পশমের মত।",
+      "englishText": ""
+    },
+    {
+      "number": 6,
+      "arabicText": "فَأَمَّا مَن ثَقُلَتۡ مَوَٰزِينُهُۥ",
+      "banglaText": "অতএব যার পাল্লা ভারী হবে",
+      "englishText": ""
+    },
+    {
+      "number": 7,
+      "arabicText": "فَهُوَ فِي عِيشَةٖ رَّاضِيَةٖ",
+      "banglaText": "সে সুখীজীবন যাপন করবে।",
+      "englishText": ""
+    },
+    {
+      "number": 8,
+      "arabicText": "وَأَمَّا مَنۡ خَفَّتۡ مَوَٰزِينُهُۥ",
+      "banglaText": "আর যার পাল্লা হালকা হবে",
+      "englishText": ""
+    },
+    {
+      "number": 9,
+      "arabicText": "فَأُمُّهُۥ هَاوِيَةٞ",
+      "banglaText": "তার ঠিকানা হবে হাবিয়া।",
+      "englishText": ""
+    },
+    {
+      "number": 10,
+      "arabicText": "وَمَآ أَدۡرَىٰكَ مَا هِيَهۡ",
+      "banglaText": "আপনি জানেন তা কি",
+      "englishText": ""
+    },
+    {
+      "number": 11,
+      "arabicText": "نَارٌ حَامِيَةُۢ",
+      "banglaText": "প্রজ্জ্বলিত অগ্নি",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

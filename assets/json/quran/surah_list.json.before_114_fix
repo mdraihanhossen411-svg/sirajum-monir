@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "arabicName": "الفاتحة",
+    "englishName": "Al-Fatihah",
+    "banglaName": "সূরা আল-ফাতিহা",
+    "totalAyah": 7,
+    "revelationType": "মাক্কী"
+  },
+  {
+    "id": 2,
+    "arabicName": "البقرة",
+    "englishName": "Al-Baqarah",
+    "banglaName": "সূরা আল-বাকারা",
+    "totalAyah": 286,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 3,
+    "arabicName": "آل عمران",
+    "englishName": "Ali 'Imran",
+    "banglaName": "সূরা আলে ইমরান",
+    "totalAyah": 200,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 4,
+    "arabicName": "النساء",
+    "englishName": "An-Nisa",
+    "banglaName": "সূরা আন-নিসা",
+    "totalAyah": 176,
+    "revelationType": "মাদানী"
+  },
+  {
+    "id": 5,
+    "arabicName": "المائدة",
+    "englishName": "Al-Ma'idah",
+    "banglaName": "সূরা আল-মায়িদাহ",
+    "totalAyah": 120,
+    "revelationType": "মাদানী"
+  }
+]

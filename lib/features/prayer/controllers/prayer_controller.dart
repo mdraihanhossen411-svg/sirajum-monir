@@ -1,0 +1,47 @@
+import '../models/prayer_models.dart';
+import '../services/adhan_service.dart';
+
+class PrayerController {
+  final AdhanService _adhanService = AdhanService();
+
+  PrayerDayTimes getTodayPrayerTimes() {
+    final now = DateTime.now();
+
+    final times = _adhanService.getTodayPrayerTimes();
+
+    return PrayerDayTimes(
+      date: now,
+      location: 'বাংলাদেশ',
+
+      fajr: PrayerTime(
+        name: 'ফজর',
+        time: times.fajr,
+      ),
+
+      sunrise: PrayerTime(
+        name: 'সূর্যোদয়',
+        time: times.sunrise,
+      ),
+
+      dhuhr: PrayerTime(
+        name: 'যোহর',
+        time: times.dhuhr,
+      ),
+
+      asr: PrayerTime(
+        name: 'আসর',
+        time: times.asr,
+      ),
+
+      maghrib: PrayerTime(
+        name: 'মাগরিব',
+        time: times.maghrib,
+      ),
+
+      isha: PrayerTime(
+        name: 'এশা',
+        time: times.isha,
+      ),
+    );
+  }
+}

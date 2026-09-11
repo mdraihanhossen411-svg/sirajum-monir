@@ -1,0 +1,33 @@
+{
+  "surahNumber": 112,
+  "arabicName": "",
+  "englishName": "",
+  "totalAyah": 4,
+  "ayahs": [
+    {
+      "number": 1,
+      "arabicText": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ",
+      "banglaText": "বলুন, তিনি আল্লাহ, এক",
+      "englishText": ""
+    },
+    {
+      "number": 2,
+      "arabicText": "ٱللَّهُ ٱلصَّمَدُ",
+      "banglaText": "আল্লাহ অমুখাপেক্ষী",
+      "englishText": ""
+    },
+    {
+      "number": 3,
+      "arabicText": "لَمۡ يَلِدۡ وَلَمۡ يُولَدۡ",
+      "banglaText": "তিনি কাউকে জন্ম দেননি এবং কেউ তাকে জন্ম দেয়নি",
+      "englishText": ""
+    },
+    {
+      "number": 4,
+      "arabicText": "وَلَمۡ يَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+      "banglaText": "এবং তার সমতুল্য কেউ নেই।",
+      "englishText": ""
+    }
+  ],
+  "banglaName": ""
+}

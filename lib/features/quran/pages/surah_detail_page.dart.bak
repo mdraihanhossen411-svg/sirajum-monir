@@ -1,0 +1,167 @@
+import 'package:flutter/material.dart';
+
+import '../models/quran_model.dart';
+
+class SurahDetailPage extends StatelessWidget {
+  final SurahModel surah;
+
+  const SurahDetailPage({
+    super.key,
+    required this.surah,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(surah.banglaName),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF0A8754),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+
+                    Text(
+                      surah.arabicName,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Amiri",
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Text(
+                      surah.englishName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      surah.banglaName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Text(
+                      "${surah.totalAyah} আয়াত • ${surah.revelationType}",
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: surah.totalAyah,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                        children: [
+
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundColor:
+                            const Color(0xFF0A8754),
+                            child: Text(
+                              "${index + 1}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          const Text(
+                            "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontFamily: "Amiri",
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          const Text(
+                            "এখানে বাংলা অনুবাদ দেখানো হবে",
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.end,
+                            children: [
+
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.bookmark_border,
+                                ),
+                                onPressed: () {},
+                              ),
+
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.volume_up,
+                                ),
+                                onPressed: () {},
+                              ),
+
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.share,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

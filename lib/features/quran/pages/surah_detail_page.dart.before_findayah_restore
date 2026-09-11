@@ -1,0 +1,500 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'surah_distribution_page.dart';
+import 'package:flutter/services.dart';
+
+import '../models/quran_model.dart';
+import '../services/bookmark_service.dart';
+import '../widgets/ayah_card.dart';
+
+class SurahDetailPage extends StatefulWidget {
+  final SurahModel surah;
+  final int? initialAyah;
+
+  const SurahDetailPage({
+    super.key,
+    required this.surah,
+    this.initialAyah,
+  });
+
+  @override
+  State<SurahDetailPage> createState() => _SurahDetailPageState();
+}
+
+class _SurahDetailPageState extends State<SurahDetailPage> {
+  final BookmarkService _bookmarkService = BookmarkService();
+
+  List<Map<String, dynamic>> _ayahs = [];
+  final Set<String> _bookmarked = <String>{};
+  final List<GlobalKey> _ayahKeys = <GlobalKey>[];
+
+  bool _loading = true;
+  String? _error;
+  int? _highlightAyah;
+
+  double _arabicFontSize = 29;
+  final double _banglaFontSize = 17;
+
+  String _safeString(dynamic value) {
+    if (value == null) return '';
+
+    if (value is String) return value;
+
+    if (value is List) {
+      return value.map((item) => item?.toString() ?? '').join(' ');
+    }
+
+    return value.toString();
+  }
+
+  int _safeInt(dynamic value, [int fallback = 0]) {
+    if (value is int) return value;
+
+    if (value is num) return value.toInt();
+
+    if (value is String) {
+      return int.tryParse(value) ?? fallback;
+    }
+
+    return fallback;
+  }
+
+  Map<String, dynamic> _safeMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(value);
+    }
+
+    if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+
+    return <String, dynamic>{};
+  }
+
+  String _key(int ayahNumber) {
+    return '${widget.surah.id}:$ayahNumber';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _highlightAyah = widget.initialAyah;
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final path =
+          'assets/json/quran/core/surah_${widget.surah.id}.json';
+
+      final jsonString = await rootBundle.loadString(path);
+      final decoded = jsonDecode(jsonString);
+
+      if (decoded is! Map) {
+        throw Exception('সূরার JSON ফরম্যাট সঠিক নয়');
+      }
+
+      final data = Map<String, dynamic>.from(decoded);
+
+      final rawAyahs = data['ayahs'];
+
+      final List<Map<String, dynamic>> loadedAyahs = [];
+
+      if (rawAyahs is List) {
+        for (final item in rawAyahs) {
+          final ayah = _safeMap(item);
+
+          if (ayah.isEmpty) continue;
+
+          loadedAyahs.add({
+            'number': _safeInt(ayah['number']),
+            'arabicText': _safeString(ayah['arabicText']),
+            'banglaText': _safeString(ayah['banglaText']),
+            'englishText': _safeString(ayah['englishText']),
+          });
+        }
+      }
+
+      final bookmarks = await _bookmarkService.load();
+
+      final Set<String> loadedBookmarks = <String>{};
+
+      for (final bookmark in bookmarks) {
+        final bookmarkSurahId = _safeInt(bookmark['surahId']);
+        final bookmarkAyahNumber = _safeInt(bookmark['ayahNumber']);
+
+        if (bookmarkSurahId == widget.surah.id &&
+            bookmarkAyahNumber > 0) {
+          loadedBookmarks.add(_key(bookmarkAyahNumber));
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _ayahs = loadedAyahs;
+        _ayahKeys
+          ..clear()
+          ..addAll(
+            List<GlobalKey>.generate(
+              loadedAyahs.length,
+              (_) => GlobalKey(),
+            ),
+          );
+
+        _bookmarked
+          ..clear()
+          ..addAll(loadedBookmarks);
+
+        _loading = false;
+        _error = null;
+      });
+
+      if (widget.initialAyah != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToAyah(widget.initialAyah!);
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('QURAN_DETAIL_ERROR: $e');
+      debugPrintStack(stackTrace: stack);
+
+      if (!mounted) return;
+
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  void _scrollToAyah(int ayahNumber) {
+    if (!mounted) return;
+
+    final index = _ayahs.indexWhere(
+      (ayah) => _safeInt(ayah['number']) == ayahNumber,
+    );
+
+    if (index < 0 || index >= _ayahKeys.length) return;
+
+    final context = _ayahKeys[index].currentContext;
+
+    if (context == null) return;
+
+    Scrollable.ensureVisible(
+      context,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+      alignment: 0.12,
+    );
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+
+      if (_highlightAyah == ayahNumber) {
+        setState(() {
+          _highlightAyah = null;
+        });
+      }
+    });
+  }
+
+  Map<String, dynamic> _bookmarkData(
+    Map<String, dynamic> ayah,
+  ) {
+    final number = _safeInt(ayah['number']);
+
+    return {
+      'surahId': widget.surah.id,
+      'surahBangla': _safeString(widget.surah.banglaName),
+      'surahArabic': _safeString(widget.surah.arabicName),
+      'surahEnglish': _safeString(widget.surah.englishName),
+      'totalAyah': widget.surah.totalAyah,
+      'ayahNumber': number,
+      'arabicText': _safeString(ayah['arabicText']),
+      'banglaText': _safeString(ayah['banglaText']),
+    };
+  }
+
+  Future<void> _toggleBookmark(
+    Map<String, dynamic> ayah,
+  ) async {
+    final number = _safeInt(ayah['number']);
+
+    if (number <= 0) return;
+
+    final saved = await _bookmarkService.toggle(
+      _bookmarkData(ayah),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      if (saved) {
+        _bookmarked.add(_key(number));
+      } else {
+        _bookmarked.remove(_key(number));
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          saved
+              ? 'বুকমার্ক সংরক্ষণ করা হয়েছে'
+              : 'বুকমার্ক সরানো হয়েছে',
+        ),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _copyAyah(
+    Map<String, dynamic> ayah,
+  ) async {
+    final number = _safeInt(ayah['number']);
+
+    final arabic = _safeString(ayah['arabicText']);
+    final bangla = _safeString(ayah['banglaText']);
+
+    final text = [
+      'সূরা ${_safeString(widget.surah.banglaName)} • আয়াত $number',
+      '',
+      arabic,
+      '',
+      bangla,
+      '',
+      '— সিরাজুম মুনির',
+    ].join('\n');
+
+    await Clipboard.setData(
+      ClipboardData(text: text),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('আয়াত কপি করা হয়েছে'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Future<void> _shareAyah(
+    Map<String, dynamic> ayah,
+  ) async {
+    final number = _safeInt(ayah['number']);
+
+    final arabic = _safeString(ayah['arabicText']);
+    final bangla = _safeString(ayah['banglaText']);
+
+    final text = [
+      'সূরা ${_safeString(widget.surah.banglaName)} • আয়াত $number',
+      '',
+      arabic,
+      '',
+      bangla,
+      '',
+      '— সিরাজুম মুনির',
+    ].join('\n');
+
+    await Clipboard.setData(
+      ClipboardData(text: text),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('আয়াতের লেখা কপি করা হয়েছে'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Widget _buildAyah(
+    int index,
+  ) {
+    final ayah = _ayahs[index];
+
+    final number = _safeInt(ayah['number']);
+    final arabic = _safeString(ayah['arabicText']);
+    final bangla = _safeString(ayah['banglaText']);
+
+    final highlighted = _highlightAyah == number;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => _saveLastRead(number),
+      child: Container(
+        key: _ayahKeys[index],
+        margin: const EdgeInsets.fromLTRB(12, 3, 12, 4),
+        decoration: highlighted
+            ? BoxDecoration(
+                color: const Color(0xFF0A8754)
+                    .withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFFC9A227)
+                      .withValues(alpha: 0.55),
+                ),
+              )
+            : null,
+        child: AyahCard(
+          ayahNumber: number,
+          arabicText: arabic,
+          banglaText: bangla,
+          arabicFontSize: _arabicFontSize,
+          banglaFontSize: _banglaFontSize,
+          isBookmarked: _bookmarked.contains(_key(number)),
+          onBookmark: () => _toggleBookmark(ayah),
+          onCopy: () => _copyAyah(ayah),
+          onShare: () => _shareAyah(ayah),
+            onTafsir: () => _showTafsirComingSoon(number),
+        ),
+      ),
+    );
+  }
+
+  void _showTafsirComingSoon(int ayahNumber) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'সংক্ষিপ্ত তাফসির',
+          textAlign: TextAlign.center,
+        ),
+        content: const Text(
+          'Coming Soon',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ঠিক আছে'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A8754),
+        foregroundColor: Colors.white,
+        title: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SurahDistributionPage(
+                  surah: widget.surah,
+                ),
+              ),
+            );
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+          ),
+          child: Text(
+            _safeString(widget.surah.banglaName),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'আরবি লেখা ছোট করুন',
+            icon: const Icon(Icons.text_decrease),
+            onPressed: () {
+              setState(() {
+                _arabicFontSize =
+                    (_arabicFontSize - 2).clamp(22.0, 38.0);
+              });
+            },
+          ),
+          IconButton(
+            tooltip: 'আরবি লেখা বড় করুন',
+            icon: const Icon(Icons.text_increase),
+            onPressed: () {
+              setState(() {
+                _arabicFontSize =
+                    (_arabicFontSize + 2).clamp(22.0, 38.0);
+              });
+            },
+          ),
+        ],
+      ),
+      body: _loading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : _error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 52,
+                          color: Colors.redAccent,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'কুরআনের তথ্য লোড করা যায়নি।',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 18),
+                        ElevatedButton.icon(
+                          onPressed: _load,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('আবার চেষ্টা করুন'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : _ayahs.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'এই সূরার কোনো আয়াত পাওয়া যায়নি।',
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(
+                              top: 4,
+                              bottom: 24,
+                            ),
+                            itemCount: _ayahs.length,
+                            itemBuilder: (context, index) {
+                              return _buildAyah(index);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+    );
+  }
+}

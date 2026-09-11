@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+import 'app_theme.dart';
+import '../features/splash/pages/splash_page.dart';
+
+class SirajumMonirApp extends StatelessWidget {
+  const SirajumMonirApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Sirajum Monir',
+      theme: AppTheme.lightTheme,
+      home: SplashPage(),
+    );
+  }
+}

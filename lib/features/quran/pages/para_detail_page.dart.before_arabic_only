@@ -1,0 +1,190 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class ParaDetailPage extends StatefulWidget {
+  final Map<String, dynamic> para;
+
+  const ParaDetailPage({
+    super.key,
+    required this.para,
+  });
+
+  @override
+  State<ParaDetailPage> createState() => _ParaDetailPageState();
+}
+
+class _ParaDetailPageState extends State<ParaDetailPage> {
+  late Future<List<Map<String, dynamic>>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _loadAyahs();
+  }
+
+  Future<List<Map<String, dynamic>>> _loadAyahs() async {
+    final startSurah = widget.para['startSurah'] as int;
+    final startAyah = widget.para['startAyah'] as int;
+    final endSurah = widget.para['endSurah'] as int;
+    final endAyah = widget.para['endAyah'] as int;
+
+    final result = <Map<String, dynamic>>[];
+
+    for (int surah = startSurah; surah <= endSurah; surah++) {
+      final raw = await rootBundle.loadString(
+        'assets/json/quran/core/surah_$surah.json',
+      );
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final ayahs = data['ayahs'] as List<dynamic>;
+
+      final first = surah == startSurah ? startAyah : 1;
+      final last = surah == endSurah
+          ? endAyah
+          : (data['totalAyah'] as int);
+
+      for (final rawAyah in ayahs) {
+        final ayah = Map<String, dynamic>.from(rawAyah as Map);
+        final number = ayah['number'] as int;
+
+        if (number >= first && number <= last) {
+          result.add({
+            ...ayah,
+            'surahNumber': surah,
+            'surahNameArabic': data['arabicName'] ?? '',
+          });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const green = Color(0xFF0A8754);
+    final number = widget.para['number'] as int;
+    final name = widget.para['name'] as String;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: green,
+        foregroundColor: Colors.white,
+        title: Text(
+          'পারা $number',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'পারা লোড করা যায়নি\n${snapshot.error}',
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+
+          final ayahs = snapshot.data ?? [];
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+            children: [
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    children: [
+                      Text(
+                        'পারা $number',
+                        style: const TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                          color: green,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...ayahs.map(
+                (ayah) => Card(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundColor: green,
+                            child: Text(
+                              '${ayah['number']}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          ayah['arabicText'] as String? ?? '',
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                          style: const TextStyle(
+                            fontSize: 25,
+                            height: 2.0,
+                            fontFamily: 'Amiri',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          ayah['banglaText'] as String? ?? '',
+                          textAlign: TextAlign.justify,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            height: 1.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

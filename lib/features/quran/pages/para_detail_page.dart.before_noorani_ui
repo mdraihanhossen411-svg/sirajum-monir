@@ -1,0 +1,282 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class ParaDetailPage extends StatefulWidget {
+  final Map<String, dynamic> para;
+
+  const ParaDetailPage({
+    super.key,
+    required this.para,
+  });
+
+  @override
+  State<ParaDetailPage> createState() => _ParaDetailPageState();
+}
+
+class _ParaDetailPageState extends State<ParaDetailPage> {
+  late Future<List<Map<String, dynamic>>> _future;
+
+  static const Color _green = Color(0xFF0A8754);
+  static const Color _gold = Color(0xFFC9A227);
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _loadAyahs();
+  }
+
+  String _textValue(dynamic value) {
+    if (value is String) return value;
+    if (value is List) return value.join(' ');
+    if (value == null) return '';
+    return value.toString();
+  }
+
+  String _numberValue(dynamic value) {
+    if (value is num) return value.toInt().toString();
+    return value?.toString() ?? '';
+  }
+
+  Future<List<Map<String, dynamic>>> _loadAyahs() async {
+    final startSurah = (widget.para['startSurah'] as num).toInt();
+    final startAyah = (widget.para['startAyah'] as num).toInt();
+    final endSurah = (widget.para['endSurah'] as num).toInt();
+    final endAyah = (widget.para['endAyah'] as num).toInt();
+
+    final surahListRaw = await rootBundle.loadString(
+      'assets/json/quran/surah_list.json',
+    );
+    final surahList = jsonDecode(surahListRaw) as List<dynamic>;
+
+    final banglaNames = <int, String>{};
+    for (final item in surahList) {
+      if (item is Map) {
+        final id = item['id'];
+        if (id is num) {
+          banglaNames[id.toInt()] = _textValue(item['banglaName']);
+        }
+      }
+    }
+
+    final result = <Map<String, dynamic>>[];
+
+    for (int surah = startSurah; surah <= endSurah; surah++) {
+      final raw = await rootBundle.loadString(
+        'assets/json/quran/core/surah_$surah.json',
+      );
+
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final ayahs = data['ayahs'] as List<dynamic>? ?? [];
+
+      final first = surah == startSurah ? startAyah : 1;
+      final totalAyah = (data['totalAyah'] as num?)?.toInt() ?? ayahs.length;
+      final last = surah == endSurah ? endAyah : totalAyah;
+
+      for (final rawAyah in ayahs) {
+        if (rawAyah is! Map) continue;
+
+        final ayah = Map<String, dynamic>.from(rawAyah);
+        final number = (ayah['number'] as num?)?.toInt();
+
+        if (number == null || number < first || number > last) {
+          continue;
+        }
+
+        result.add({
+          'surahNumber': surah,
+          'surahNameArabic': _textValue(data['arabicName']),
+          'surahNameBangla': banglaNames[surah] ?? '',
+          'number': number,
+          'arabicText': _textValue(ayah['arabicText']),
+        });
+      }
+    }
+
+    return result;
+  }
+
+  Widget _buildSurahHeader(Map<String, dynamic> ayah) {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(4, 12, 4, 8),
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 14,
+        ),
+        child: Column(
+          children: [
+            Text(
+              _textValue(ayah['surahNameArabic']),
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: _green,
+                fontFamily: 'Amiri',
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              _textValue(ayah['surahNameBangla']),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: _gold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildParaAyahs(
+    List<Map<String, dynamic>> ayahs,
+  ) {
+    final children = <Widget>[];
+    int? previousSurah;
+
+    for (final ayah in ayahs) {
+      final surahNumber = (ayah['surahNumber'] as num?)?.toInt();
+
+      if (surahNumber != previousSurah) {
+        children.add(_buildSurahHeader(ayah));
+        previousSurah = surahNumber;
+      }
+
+      children.add(
+        Card(
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          elevation: 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: _green,
+                    child: Text(
+                      _numberValue(ayah['number']),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _textValue(ayah['arabicText']),
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    height: 2.0,
+                    fontFamily: 'Amiri',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return children;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final number = (widget.para['number'] as num?)?.toInt() ?? 0;
+    final name = _textValue(widget.para['name']);
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: _green,
+        foregroundColor: Colors.white,
+        title: Text(
+          'পারা $number',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'পারা লোড করা যায়নি\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          final ayahs = snapshot.data ?? [];
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+            children: [
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    children: [
+                      Text(
+                        'পারা $number',
+                        style: const TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                          color: _green,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ..._buildParaAyahs(ayahs),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
