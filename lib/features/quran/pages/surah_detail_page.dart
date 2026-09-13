@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'surah_distribution_page.dart';
 import 'package:flutter/services.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../models/quran_model.dart';
 import '../services/bookmark_service.dart';
@@ -27,7 +28,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
 
   List<Map<String, dynamic>> _ayahs = [];
   final Set<String> _bookmarked = <String>{};
-  final List<GlobalKey> _ayahKeys = <GlobalKey>[];
+  final ItemScrollController _itemScrollController = ItemScrollController();
 
   bool _loading = true;
   String? _error;
@@ -134,14 +135,6 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
 
       setState(() {
         _ayahs = loadedAyahs;
-        _ayahKeys
-          ..clear()
-          ..addAll(
-            List<GlobalKey>.generate(
-              loadedAyahs.length,
-              (_) => GlobalKey(),
-            ),
-          );
 
         _bookmarked
           ..clear()
@@ -169,55 +162,69 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     }
   }
 
-  void _scrollToAyah(int ayahNumber) {
+  void _scrollToAyah(
+  int ayahNumber, [
+  int attempt = 0,
+]) {
+  if (!mounted) return;
+
+  final index = _ayahs.indexWhere(
+    (ayah) => _safeInt(ayah['number']) == ayahNumber,
+  );
+
+  if (index < 0) return;
+
+  if (!_itemScrollController.isAttached) {
+    if (attempt < 30) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _scrollToAyah(ayahNumber, attempt + 1);
+        }
+      });
+    }
+    return;
+  }
+
+  _itemScrollController.scrollTo(
+    index: index,
+    duration: const Duration(milliseconds: 700),
+    curve: Curves.easeOutCubic,
+    alignment: 0.12,
+  );
+
+  setState(() {
+    _highlightAyah = ayahNumber;
+  });
+
+  Future.delayed(const Duration(seconds: 3), () {
     if (!mounted) return;
 
-    final index = _ayahs.indexWhere(
-      (ayah) => _safeInt(ayah['number']) == ayahNumber,
-    );
-
-    if (index < 0 || index >= _ayahKeys.length) return;
-
-    final context = _ayahKeys[index].currentContext;
-
-    if (context == null) return;
-
-    Scrollable.ensureVisible(
-      context,
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeOutCubic,
-      alignment: 0.12,
-    );
-
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-
-      if (_highlightAyah == ayahNumber) {
-        setState(() {
-          _highlightAyah = null;
-        });
-      }
-    });
-  }
+    if (_highlightAyah == ayahNumber) {
+      setState(() {
+        _highlightAyah = null;
+      });
+    }
+  });
+}
 
   Map<String, dynamic> _bookmarkData(
-    Map<String, dynamic> ayah,
-  ) {
-    final number = _safeInt(ayah['number']);
+  Map<String, dynamic> ayah,
+) {
+  final number = _safeInt(ayah['number']);
 
-    return {
-      'surahId': widget.surah.id,
-      'surahBangla': _safeString(widget.surah.banglaName),
-      'surahArabic': _safeString(widget.surah.arabicName),
-      'surahEnglish': _safeString(widget.surah.englishName),
-      'totalAyah': widget.surah.totalAyah,
-      'ayahNumber': number,
-      'arabicText': _safeString(ayah['arabicText']),
-      'banglaText': _safeString(ayah['banglaText']),
-    };
-  }
+  return {
+    'surahId': widget.surah.id,
+    'surahBangla': _safeString(widget.surah.banglaName),
+    'surahArabic': _safeString(widget.surah.arabicName),
+    'surahEnglish': _safeString(widget.surah.englishName),
+    'totalAyah': widget.surah.totalAyah,
+    'ayahNumber': number,
+    'arabicText': _safeString(ayah['arabicText']),
+    'banglaText': _safeString(ayah['banglaText']),
+  };
+}
 
-  Future<void> _toggleBookmark(
+Future<void> _toggleBookmark(
     Map<String, dynamic> ayah,
   ) async {
     final number = _safeInt(ayah['number']);
@@ -282,37 +289,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     );
   }
 
-  Future<void> _shareAyah(
-    Map<String, dynamic> ayah,
-  ) async {
-    final number = _safeInt(ayah['number']);
 
-    final arabic = _safeString(ayah['arabicText']);
-    final bangla = _safeString(ayah['banglaText']);
-
-    final text = [
-      'সূরা ${_safeString(widget.surah.banglaName)} • আয়াত $number',
-      '',
-      arabic,
-      '',
-      bangla,
-      '',
-      '— সিরাজুম মুনির',
-    ].join('\n');
-
-    await Clipboard.setData(
-      ClipboardData(text: text),
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('আয়াতের লেখা কপি করা হয়েছে'),
-        duration: Duration(seconds: 1),
-      ),
-    );
-  }
 
   Widget _buildAyah(
     int index,
@@ -328,8 +305,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       child: Container(
-        key: _ayahKeys[index],
-        margin: const EdgeInsets.fromLTRB(12, 3, 12, 4),
+        margin: const EdgeInsets.fromLTRB(8, 1, 8, 2),
         decoration: highlighted
             ? BoxDecoration(
                 color: const Color(0xFF0A8754)
@@ -350,7 +326,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           isBookmarked: _bookmarked.contains(_key(number)),
           onBookmark: () => _toggleBookmark(ayah),
           onCopy: () => _copyAyah(ayah),
-          onShare: () => _shareAyah(ayah),
+          onShare: null,
             onTafsir: () => _showTafsirComingSoon(number),
         ),
       ),
@@ -358,6 +334,41 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
   }
 
   void _showTafsirComingSoon(int ayahNumber) {
+    const fatihaTafsir = <int, String>{
+      1: 'যেকোনো ভালো কাজ বা ইবাদত আল্লাহর নাম নিয়ে শুরু করার নির্দেশ দেওয়া হয়েছে এখানে। ‘আল্লাহ’ হলো তাঁর সর্বশ্রেষ্ঠ এবং নিজস্ব নাম। ‘আর-রাহমান’ (পরম করুণাময়) অর্থ হলো যাঁর দয়া সমগ্র সৃষ্টিজগতের জন্য উন্মুক্ত। আর ‘আর-রহিম’ (অসীম দয়ালু) অর্থ হলো যাঁর বিশেষ রহমত বা দয়া কেবল মুমিন বা বিশ্বাসীদের জন্য নির্দিষ্ট।',
+      2: 'সমস্ত কৃতজ্ঞতা ও প্রশংসা একমাত্র আল্লাহরই প্রাপ্য। কারণ তিনিই ‘রাব্বুল আলামিন’ বা তামাম জাহানের লালনপালনকারী, সৃষ্টিকর্তা ও পরিচালক। তিনি পুরো সৃষ্টিজগৎকে ধাপে ধাপে পূর্ণতার দিকে এগিয়ে নিয়ে যাচ্ছেন।',
+      3: 'দ্বিতীয় আয়াতে আল্লাহর প্রভুত্ব ও ক্ষমতার কথা বলার পর, তাঁর রহমত ও দয়ার গুণের পুনরাবৃত্তি করা হয়েছে। এর মাধ্যমে বান্দার মনে ভয়ের পাশাপাশি আল্লাহর প্রতি অগাধ ভালোবাসা ও আশার সঞ্চার ঘটে যে, তাদের পালনকর্তা অত্যন্ত দয়ালু।',
+      4: '‘দিন আদ-দ্বীন’ অর্থ প্রতিদান বা বিচারের দিন (আখিরাত)। সেদিন সব মানুষ তাদের ভালো ও মন্দ কাজের পূর্ণ বিচার ও প্রতিদান পাবে। দুনিয়াতে ক্ষমতাশালীরা নিজেদের মালিক দাবি করলেও সেদিন একমাত্র আল্লাহই হবেন সর্বময় ক্ষমতার একক মালিক ও শাসক। এই বিশ্বাস মানুষকে পাপ কাজ থেকে দূরে রাখে।',
+      5: 'এটি বান্দা ও আল্লাহর মধ্যকার সম্পর্কের মূল ভিত্তি। এখানে বান্দা ঘোষণা করছে যে, সে ইবাদত, বন্দেগী, উপাসনা ও আনুগত্য একমাত্র আল্লাহর জন্যই করবে এবং বিপদে-আপদে, সব কাজে শক্তি ও সাহায্য পাওয়ার জন্য কেবল তাঁরই ওপর ভরসা করবে।',
+      6: 'বান্দা এখন আল্লাহর কাছে সবচেয়ে বড় নিয়ামত অর্থাৎ সঠিক ও সরল পথের (হিদায়াত) প্রার্থনা জানাচ্ছে। যে পথ দুনিয়াতে শান্তি এবং আখিরাতে জান্নাতের দিকে নিয়ে যায়—অর্থাৎ ইসলামের সঠিক পথ বা নবী-রাসূলগণের দেখানো পথ।',
+      7: '‘অনুগ্রহপ্রাপ্ত’ হলেন নবী, সিদ্দীক, শহীদ ও নেককার বান্দাগণ। ‘গজবপ্রাপ্ত’ (আল-মাগদুব) হলো তারা, যারা সত্য জানার পরও তা অস্বীকার করেছে বা অনুযায়ী আমল করেনি। আর ‘পথভ্রষ্ট’ (আদ-দাল্লিন) হলো তারা, যারা অজ্ঞতা ও ভুলের কারণে সঠিক পথ হারিয়ে ফেলেছে। এই আয়াতে তাদের পথ থেকে বেঁচে থাকার দোয়া করা হয়েছে।',
+    };
+
+    final tafsir = fatihaTafsir[ayahNumber];
+
+    if (tafsir == null) {
+      showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            'সংক্ষিপ্ত তাফসির',
+            textAlign: TextAlign.center,
+          ),
+          content: const Text(
+            'তাফসির শীঘ্রই যোগ করা হবে।',
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('ঠিক আছে'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -365,9 +376,15 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           'সংক্ষিপ্ত তাফসির',
           textAlign: TextAlign.center,
         ),
-        content: const Text(
-          'Coming Soon',
-          textAlign: TextAlign.center,
+        content: SingleChildScrollView(
+          child: Text(
+            tafsir,
+            textAlign: TextAlign.justify,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.7,
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -385,27 +402,62 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A8754),
         foregroundColor: Colors.white,
-        title: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => SurahDistributionPage(
-                  surah: widget.surah,
-                ),
-              ),
-            );
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+        title: Container(
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFFC9A227).withValues(alpha: 0.75),
+              width: 1,
+            ),
           ),
-          child: Text(
-            _safeString(widget.surah.banglaName),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SurahDistributionPage(
+                    surah: widget.surah,
+                  ),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.menu_book_rounded,
+                    color: Color(0xFFC9A227),
+                    size: 19,
+                  ),
+                  const SizedBox(width: 7),
+                  Flexible(
+                    child: Text(
+                      _safeString(widget.surah.banglaName),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white70,
+                    size: 19,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -481,7 +533,8 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                   : Column(
                       children: [
                         Expanded(
-                          child: ListView.builder(
+                          child: ScrollablePositionedList.builder(
+                            itemScrollController: _itemScrollController,
                             padding: const EdgeInsets.only(
                               top: 4,
                               bottom: 24,

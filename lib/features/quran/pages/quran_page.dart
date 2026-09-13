@@ -372,35 +372,36 @@ final TextEditingController _surahSearchController =
               fontWeight: FontWeight.bold,
             ),
           ),
-          bottom:
-              const PreferredSize(
-            preferredSize:
-                Size.fromHeight(118),
-            child: SizedBox.shrink(),
-          ),
-          flexibleSpace:
-              SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 48),
-                _searchSection(),
-              ],
-            ),
-          ),
         ),
-        body: Column(
-                children: [
-                  const Expanded(
-                    child: TabBarView(
-                      children: [
-                        SurahListPage(),
-                        JuzPage(),
-                        BookmarkPage(),
-                      ],
+        body: Builder(
+          builder: (context) {
+            final controller = DefaultTabController.of(context);
+
+            return AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) {
+                return Column(
+                  children: [
+                    if (controller.index == 0) ...[
+                      const SizedBox(height: 8),
+                      _searchSection(),
+                      const SizedBox(height: 4),
+                    ],
+                    const Expanded(
+                      child: TabBarView(
+                        children: [
+                          SurahListPage(),
+                          JuzPage(),
+                          BookmarkPage(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

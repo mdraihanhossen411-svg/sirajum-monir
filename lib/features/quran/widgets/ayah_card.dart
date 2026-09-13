@@ -41,14 +41,14 @@ class AyahCard extends StatelessWidget {
 
     return Card(
       elevation: 1.5,
-      margin: const EdgeInsets.fromLTRB(12, 2, 12, 3),
+      margin: const EdgeInsets.fromLTRB(8, 1, 8, 2),
       shadowColor: green.withValues(alpha: 0.12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(color: green.withValues(alpha: 0.12)),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+        padding: const EdgeInsets.fromLTRB(12, 5, 12, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -77,9 +77,9 @@ class AyahCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Container(
-              padding: const EdgeInsets.fromLTRB(4, 2, 4, 4),
+              padding: const EdgeInsets.fromLTRB(4, 1, 4, 2),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: green.withValues(alpha: 0.10)),
@@ -98,9 +98,9 @@ class AyahCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Container(
-              padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               decoration: BoxDecoration(
                 color: green.withValues(alpha: 0.045),
                 borderRadius: BorderRadius.circular(13),
@@ -117,7 +117,7 @@ class AyahCard extends StatelessWidget {
               ),
             ),
             if (englishText != null) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
@@ -131,7 +131,7 @@ class AyahCard extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

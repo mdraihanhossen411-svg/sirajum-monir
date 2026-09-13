@@ -20,9 +20,11 @@ class SurahDistributionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMakkah =
-        surah.revelationType.toLowerCase().contains('mak') ||
-        surah.revelationType.contains('মক্ক');
+    final revelationType = switch (surah.revelationType.trim()) {
+      'মাক্কী' => 'মাক্কী',
+      'মাদানী' => 'মাদানী',
+      _ => 'তথ্য নেই',
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -59,7 +61,7 @@ class SurahDistributionPage extends StatelessWidget {
             icon: Icons.location_on_outlined,
             title: 'নাজিলের স্থান',
             child: Text(
-              isMakkah ? 'মক্কী' : 'মাদানী',
+              revelationType,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,

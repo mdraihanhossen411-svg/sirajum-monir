@@ -18,13 +18,18 @@ class ParaDetailPage extends StatefulWidget {
 class _ParaDetailPageState extends State<ParaDetailPage> {
   late Future<List<Map<String, dynamic>>> _future;
 
-  static const Color _green = Color(0xFF0A8754);
+  static const Color _green = Color(0xFF087A3B);
   static const Color _gold = Color(0xFFC9A227);
 
   @override
   void initState() {
     super.initState();
-    _future = _loadAyahs();
+    _future = _loadPara();
+  }
+
+  int _intValue(dynamic value) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   String _textValue(dynamic value) {
@@ -34,62 +39,150 @@ class _ParaDetailPageState extends State<ParaDetailPage> {
     return value.toString();
   }
 
-  String _numberValue(dynamic value) {
-    if (value is num) return value.toInt().toString();
-    return value?.toString() ?? '';
+  String _banglaNumber(int number) {
+    const en = '0123456789';
+    const bn = '০১২৩৪৫৬৭৮৯';
+
+    return number
+        .toString()
+        .split('')
+        .map((c) {
+          final index = en.indexOf(c);
+          return index >= 0 ? bn[index] : c;
+        })
+        .join();
   }
 
-  Future<List<Map<String, dynamic>>> _loadAyahs() async {
-    final startSurah = (widget.para['startSurah'] as num).toInt();
-    final startAyah = (widget.para['startAyah'] as num).toInt();
-    final endSurah = (widget.para['endSurah'] as num).toInt();
-    final endAyah = (widget.para['endAyah'] as num).toInt();
+  Future<List<Map<String, dynamic>>> _loadPara() async {
+    final startSurah = _intValue(widget.para['startSurah']);
+    final startAyah = _intValue(widget.para['startAyah']);
+    final endSurah = _intValue(widget.para['endSurah']);
+    final endAyah = _intValue(widget.para['endAyah']);
 
     final surahListRaw = await rootBundle.loadString(
       'assets/json/quran/surah_list.json',
     );
-    final surahList = jsonDecode(surahListRaw) as List<dynamic>;
 
-    final banglaNames = <int, String>{};
-    for (final item in surahList) {
-      if (item is Map) {
-        final id = item['id'];
-        if (id is num) {
-          banglaNames[id.toInt()] = _textValue(item['banglaName']);
+    final decodedSurahs = jsonDecode(surahListRaw);
+
+    final surahInfo = <int, Map<String, dynamic>>{};
+
+    if (decodedSurahs is List) {
+      for (final item in decodedSurahs) {
+        if (item is! Map) continue;
+
+        final id = _intValue(item['id']);
+
+        if (id > 0) {
+          surahInfo[id] = Map<String, dynamic>.from(item);
         }
       }
     }
 
     final result = <Map<String, dynamic>>[];
 
+    // ১ম পারায় সূরা ফাতিহা আগে দেখানো হবে
+    if (_intValue(widget.para['number']) == 1 && startSurah == 2) {
+      final rawFatiha = await rootBundle.loadString(
+        'assets/json/quran/core/surah_1.json',
+      );
+      final decodedFatiha = jsonDecode(rawFatiha);
+
+      if (decodedFatiha is Map) {
+        final fatihaData = Map<String, dynamic>.from(decodedFatiha);
+        final fatihaAyahs = fatihaData['ayahs'];
+
+        if (fatihaAyahs is List) {
+          for (final item in fatihaAyahs) {
+            if (item is! Map) continue;
+
+            final ayah = Map<String, dynamic>.from(item);
+            final number = _intValue(ayah['number']);
+            final arabicText = _textValue(ayah['arabicText']).trim();
+
+            if (arabicText.isEmpty) continue;
+
+            result.add({
+              'surahNumber': 1,
+              'surahNameBangla': _textValue(
+                surahInfo[1]?['banglaName'],
+              ),
+              'surahNameArabic': _textValue(
+                surahInfo[1]?['arabicName'],
+              ),
+              'number': number,
+              'arabicText': arabicText,
+            });
+          }
+        }
+      }
+    }
+
     for (int surah = startSurah; surah <= endSurah; surah++) {
-      final raw = await rootBundle.loadString(
-        'assets/json/quran/core/surah_$surah.json',
+      final path =
+          'assets/json/quran/core/surah_$surah.json';
+
+      final raw = await rootBundle.loadString(path);
+      final decoded = jsonDecode(raw);
+
+      if (decoded is! Map) continue;
+
+      final data = Map<String, dynamic>.from(decoded);
+
+      final rawAyahs = data['ayahs'];
+
+      if (rawAyahs is! List) continue;
+
+      final info = surahInfo[surah];
+
+      final banglaName = _textValue(
+        info?['banglaName'],
       );
 
-      final data = jsonDecode(raw) as Map<String, dynamic>;
-      final ayahs = data['ayahs'] as List<dynamic>? ?? [];
+      final arabicName = _textValue(
+        info?['arabicName'],
+      );
 
-      final first = surah == startSurah ? startAyah : 1;
-      final totalAyah = (data['totalAyah'] as num?)?.toInt() ?? ayahs.length;
-      final last = surah == endSurah ? endAyah : totalAyah;
+      final totalAyah = _intValue(
+        data['totalAyah'],
+      );
 
-      for (final rawAyah in ayahs) {
-        if (rawAyah is! Map) continue;
+      final firstAyah =
+          surah == startSurah ? startAyah : 1;
 
-        final ayah = Map<String, dynamic>.from(rawAyah);
-        final number = (ayah['number'] as num?)?.toInt();
+      final lastAyah =
+          surah == endSurah
+              ? endAyah
+              : (totalAyah > 0
+                  ? totalAyah
+                  : rawAyahs.length);
 
-        if (number == null || number < first || number > last) {
+      for (final item in rawAyahs) {
+        if (item is! Map) continue;
+
+        final ayah = Map<String, dynamic>.from(item);
+
+        final number = _intValue(
+          ayah['number'],
+        );
+
+        if (number < firstAyah ||
+            number > lastAyah) {
           continue;
         }
 
+        final arabicText = _textValue(
+          ayah['arabicText'],
+        ).trim();
+
+        if (arabicText.isEmpty) continue;
+
         result.add({
           'surahNumber': surah,
-          'surahNameArabic': _textValue(data['arabicName']),
-          'surahNameBangla': banglaNames[surah] ?? '',
+          'surahNameBangla': banglaName,
+          'surahNameArabic': arabicName,
           'number': number,
-          'arabicText': _textValue(ayah['arabicText']),
+          'arabicText': arabicText,
         });
       }
     }
@@ -97,131 +190,274 @@ class _ParaDetailPageState extends State<ParaDetailPage> {
     return result;
   }
 
-  Widget _buildSurahHeader(Map<String, dynamic> ayah) {
-    return Card(
-      margin: const EdgeInsets.fromLTRB(4, 8, 4, 5),
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+  Widget _buildSurahHeader(
+    BuildContext context,
+    Map<String, dynamic> surah,
+  ) {
+    final surahNumber = _intValue(surah['surahNumber']);
+    final banglaName = _textValue(surah['surahNameBangla']);
+    final arabicName = _textValue(surah['surahNameArabic']);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(10, 8, 10, 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 14,
+      decoration: BoxDecoration(
+        color: _green.withValues(alpha: 0.08),
+        border: Border.all(
+          color: _gold.withValues(alpha: 0.65),
+          width: 1,
         ),
-        child: Column(
-          children: [
-            Text(
-              _textValue(ayah['surahNameArabic']),
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.rtl,
-              style: const TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: _green,
-                fontFamily: 'Amiri',
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '(${_banglaNumber(surahNumber)})  সূরা $banglaName',
+                  softWrap: true,
+                style: TextStyle(
+                    color: _green,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              _textValue(ayah['surahNameBangla']),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: _gold,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  arabicName,
+                  softWrap: true,
+                textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          const Text(
+            'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.rtl,
+            style: TextStyle(
+              fontSize: 18,
+              height: 1.25,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  List<Widget> _buildParaAyahs(
+  Widget _buildMushafText(
+    BuildContext context,
     List<Map<String, dynamic>> ayahs,
   ) {
-    final children = <Widget>[];
-    int? previousSurah;
+    final isDark =
+        Theme.of(context).brightness ==
+            Brightness.dark;
+
+    final textColor = isDark
+        ? Colors.white
+        : const Color(0xFF171717);
+
+    final spans = <InlineSpan>[];
 
     for (final ayah in ayahs) {
-      final surahNumber = (ayah['surahNumber'] as num?)?.toInt();
+      final number = _intValue(
+        ayah['number'],
+      );
 
-      if (surahNumber != previousSurah) {
-        children.add(_buildSurahHeader(ayah));
-        previousSurah = surahNumber;
-      }
+      final arabic = _textValue(
+        ayah['arabicText'],
+      ).trim();
 
-      children.add(
-        Card(
-          margin: const EdgeInsets.symmetric(vertical: 2),
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 7, 16, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CircleAvatar(
-                    radius: 15,
-                    backgroundColor: _green,
-                    child: Text(
-                      _numberValue(ayah['number']),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _textValue(ayah['arabicText']),
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                  style: const TextStyle(
-                    fontSize: 25,
-                    height: 2.0,
-                    fontFamily: 'Amiri',
-                  ),
-                ),
-              ],
-            ),
+      if (arabic.isEmpty) continue;
+
+      spans.add(
+        TextSpan(
+          text: '$arabic ',
+        ),
+      );
+
+      spans.add(
+        TextSpan(
+          text: '۝${_banglaNumber(number)} ',
+          style: const TextStyle(
+            color: _gold,
+            fontSize: 23,
+            fontWeight: FontWeight.bold,
           ),
         ),
       );
     }
 
-    return children;
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 4,
+      ),
+      padding: const EdgeInsets.fromLTRB(
+        12,
+        6,
+        12,
+        18,
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF0F1D16)
+            : const Color(0xFFFFFEF8),
+      ),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: RichText(
+          textAlign: TextAlign.justify,
+          textDirection: TextDirection.rtl,
+          text: TextSpan(
+            style: TextStyle(
+              color: textColor,
+              fontSize: 28,
+              height: 2.15,
+              fontWeight: FontWeight.w400,
+            ),
+            children: spans,
+          ),
+        ),
+      ),
+    );
+  }
+
+  
+
+  Widget _buildSurahSection(
+    BuildContext context,
+    List<Map<String, dynamic>> surahAyahs,
+  ) {
+    if (surahAyahs.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        _buildSurahHeader(
+          context,
+          surahAyahs.first,
+        ),
+        _buildMushafText(
+          context,
+          surahAyahs,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildContent(
+    BuildContext context,
+    List<Map<String, dynamic>> ayahs,
+  ) {
+    final widgets = <Widget>[];
+
+    int? currentSurah;
+    final current = <Map<String, dynamic>>[];
+
+    void flush() {
+      if (current.isEmpty) return;
+
+      widgets.add(
+        _buildSurahSection(
+          context,
+          List<Map<String, dynamic>>.from(current),
+        ),
+      );
+
+      current.clear();
+    }
+
+    for (final ayah in ayahs) {
+      final surah = _intValue(
+        ayah['surahNumber'],
+      );
+
+    currentSurah ??= surah;
+
+      if (surah != currentSurah) {
+        flush();
+        currentSurah = surah;
+      }
+
+      current.add(ayah);
+    }
+
+    flush();
+
+    return widgets;
   }
 
   @override
   Widget build(BuildContext context) {
-    final number = (widget.para['number'] as num?)?.toInt() ?? 0;
-    final name = _textValue(widget.para['name']);
+    final number = _intValue(
+      widget.para['number'],
+    );
+
+    final isDark =
+        Theme.of(context).brightness ==
+            Brightness.dark;
+
+    final background = isDark
+        ? const Color(0xFF0D1B14)
+        : const Color(0xFFF4F1E7);
 
     return Scaffold(
+      backgroundColor: background,
       appBar: AppBar(
         backgroundColor: _green,
         foregroundColor: Colors.white,
-        title: Text(
-          'পারা $number',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+        elevation: 0,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            Text(
+              '${_banglaNumber(number)}ম পারা',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _textValue(widget.para['name']),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<
+          List<Map<String, dynamic>>>(
         future: _future,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: _green,
+              ),
             );
           }
 
@@ -230,7 +466,7 @@ class _ParaDetailPageState extends State<ParaDetailPage> {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  'পারা লোড করা যায়নি\n${snapshot.error}',
+                  'পারা লোড করা যায়নি\n\n${snapshot.error}',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -239,40 +475,23 @@ class _ParaDetailPageState extends State<ParaDetailPage> {
 
           final ayahs = snapshot.data ?? [];
 
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
-            children: [
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    children: [
-                      Text(
-                        'পারা $number',
-                        style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.bold,
-                          color: _green,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        name,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          if (ayahs.isEmpty) {
+            return const Center(
+              child: Text(
+                'এই পারার কোনো আয়াত পাওয়া যায়নি।',
               ),
-              ..._buildParaAyahs(ayahs),
+            );
+          }
+
+          return ListView(
+            padding: const EdgeInsets.only(
+              bottom: 40,
+            ),
+            children: [
+              ..._buildContent(
+                context,
+                ayahs,
+              ),
             ],
           );
         },

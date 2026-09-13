@@ -16,8 +16,13 @@ class SurahCard extends StatelessWidget {
     const green = Color(0xFF0A8754);
     const gold = Color(0xFFC9A227);
 
+    final bool isMadani = surah.revelationType == 'মাদানী';
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 5,
+      ),
       elevation: 1.5,
       shadowColor: green.withValues(alpha: 0.12),
       shape: RoundedRectangleBorder(
@@ -90,6 +95,31 @@ class SurahCard extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.grey.shade700,
                         fontSize: 13,
+                      ),
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isMadani
+                            ? const Color(0xFF1565C0).withValues(alpha: 0.10)
+                            : green.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: Text(
+                        surah.revelationType,
+                        style: TextStyle(
+                          color: isMadani
+                              ? const Color(0xFF1565C0)
+                              : green,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
