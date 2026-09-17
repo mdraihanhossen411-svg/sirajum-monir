@@ -1,0 +1,192 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../../features/daily/services/daily_content_service.dart';
+
+class NotificationService {
+  NotificationService._();
+
+  static final NotificationService instance = NotificationService._();
+
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
+
+  final DailyContentService _dailyContentService =
+      DailyContentService();
+
+  static const String _channelId = 'daily_islamic_content';
+  static const String _channelName = 'দৈনিক ইসলামিক নোটিফিকেশন';
+  static const String _channelDescription =
+      'আয়াত, হাদিস, দোয়া ও আমলের দৈনিক নোটিফিকেশন';
+
+  Future<void> initialize() async {
+    tz.initializeTimeZones();
+
+    // বাংলাদেশ সময়: UTC+6
+    tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
+
+    const settings = InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    );
+
+    await _plugin.initialize(
+      settings: settings,
+    );
+
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+  }
+
+  Future<void> scheduleDaily({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime date,
+    required int hour,
+    required int minute,
+  }) async {
+    final scheduledDate = tz.TZDateTime(
+      tz.local,
+      date.year,
+      date.month,
+      date.day,
+      hour,
+      minute,
+    );
+
+    if (!scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
+      return;
+    }
+
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          channelDescription: _channelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
+  Future<void> scheduleUpcomingAyahNotifications({
+    int days = 30,
+  }) async {
+    final now = tz.TZDateTime.now(tz.local);
+
+    for (int offset = 0; offset < days; offset++) {
+      final date = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day + offset,
+      );
+
+      final content = await _dailyContentService.getForDate(date);
+
+      if (content == null) {
+        continue;
+      }
+
+      final ayahText = await _dailyContentService.getAyahBanglaText(
+        surahNumber: content.ayah.surahNumber,
+        ayahNumber: content.ayah.ayahNumber,
+      );
+
+      if (ayahText.trim().isEmpty) {
+        continue;
+      }
+
+      await scheduleDaily(
+        id: _notificationId(date, 1),
+        title: '📖 আজকের আয়াত',
+        body: '$ayahText\n${content.ayah.source}',
+        date: date,
+        hour: 6,
+        minute: 0,
+      );
+    }
+  }
+
+  Future<void> scheduleTodayContent() async {
+    final now = tz.TZDateTime.now(tz.local);
+
+    final content = await _dailyContentService.getToday();
+
+    if (content == null) {
+      return;
+    }
+
+    // আজকের আয়াতের বাংলা অনুবাদ বের করা
+    final ayahText = await _dailyContentService.getAyahBanglaText(
+      surahNumber: content.ayah.surahNumber,
+      ayahNumber: content.ayah.ayahNumber,
+    );
+
+    if (ayahText.isNotEmpty) {
+      final ayahBody = '$ayahText\n${content.ayah.source}';
+
+      await scheduleDaily(
+        id: _notificationId(now, 1),
+        title: '📖 আজকের আয়াত',
+        body: ayahBody,
+        date: now,
+        hour: 6,
+        minute: 0,
+      );
+    }
+
+    // হাদিসের তথ্য না থাকলে notification পাঠানো হবে না
+    if (content.hadith.source.trim().isNotEmpty) {
+      await scheduleDaily(
+        id: _notificationId(now, 2),
+        title: '📜 আজকের হাদিস',
+        body: content.hadith.source,
+        date: now,
+        hour: 9,
+        minute: 0,
+      );
+    }
+
+    // দোয়ার তথ্য না থাকলে notification পাঠানো হবে না
+    if (content.dua.source.trim().isNotEmpty) {
+      await scheduleDaily(
+        id: _notificationId(now, 3),
+        title: '🤲 আজকের দোয়া',
+        body: content.dua.source,
+        date: now,
+        hour: 12,
+        minute: 0,
+      );
+    }
+
+    // আমলের তথ্য না থাকলে notification পাঠানো হবে না
+    if (content.amal.source.trim().isNotEmpty) {
+      await scheduleDaily(
+        id: _notificationId(now, 4),
+        title: '🌙 আজকের আমল',
+        body: content.amal.source,
+        date: now,
+        hour: 15,
+        minute: 0,
+      );
+    }
+  }
+
+  int _notificationId(DateTime date, int type) {
+    final dayOfYear =
+        date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+
+    return (date.year * 10000) + (dayOfYear * 10) + type;
+  }
+}

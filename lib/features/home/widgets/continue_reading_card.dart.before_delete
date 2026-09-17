@@ -1,0 +1,229 @@
+import 'package:flutter/material.dart';
+
+import '../../quran/models/quran_model.dart';
+import '../../quran/pages/surah_detail_page.dart';
+import '../../quran/pages/quran_page.dart';
+import '../../quran/services/last_read_service.dart';
+import '../../quran/services/quran_service.dart';
+
+class ContinueReadingCard extends StatefulWidget {
+  const ContinueReadingCard({super.key});
+
+  @override
+  State<ContinueReadingCard> createState() => _ContinueReadingCardState();
+}
+
+class _ContinueReadingCardState extends State<ContinueReadingCard> {
+  final LastReadService _lastReadService = LastReadService();
+  final QuranService _quranService = QuranService();
+
+  Map<String, dynamic>? _lastRead;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLastRead();
+  }
+
+  Future<void> _loadLastRead() async {
+    try {
+      final data = await _lastReadService.load();
+
+      if (!mounted) return;
+
+      setState(() {
+        _lastRead = data;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _lastRead = null;
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _continueReading() async {
+    final data = _lastRead;
+
+    if (data == null) {
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const QuranPage(),
+        ),
+      );
+
+      return;
+    }
+
+    final surahId = data['surahId'] as int? ?? 0;
+    final ayahNumber = data['ayahNumber'] as int? ?? 0;
+
+    if (surahId <= 0 || ayahNumber <= 0) return;
+
+    try {
+      final metadata = await _quranService.loadSurahList();
+
+      final matching = metadata
+          .whereType<Map>()
+          .map(
+            (item) => SurahModel.fromJson(
+              Map<String, dynamic>.from(item),
+            ),
+          )
+          .where((surah) => surah.id == surahId)
+          .toList();
+
+      if (matching.isEmpty) {
+        if (!mounted) return;
+        return;
+      }
+
+      final surah = matching.first;
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SurahDetailPage(
+            surah: surah,
+            initialAyah: ayahNumber,
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('কুরআন পৃষ্ঠা খুলতে সমস্যা হয়েছে।'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLastRead = _lastRead != null;
+
+    final surahBangla =
+        _lastRead?['surahBangla'] as String? ?? '';
+
+    final surahArabic =
+        _lastRead?['surahArabic'] as String? ?? '';
+
+    final ayahNumber =
+        _lastRead?['ayahNumber'] as int? ?? 0;
+
+    final totalAyah =
+        _lastRead?['totalAyah'] as int? ?? 0;
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF0A8754),
+              Color(0xFF0F9D58),
+            ],
+          ),
+        ),
+        child: _loading
+            ? const SizedBox(
+                height: 150,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "📖 পাঠ চালিয়ে যান",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    hasLastRead && surahBangla.isNotEmpty
+                        ? surahBangla
+                        : "কুরআন পাঠ শুরু করুন",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  if (hasLastRead && surahArabic.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      surahArabic,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    hasLastRead && ayahNumber > 0
+                        ? "আয়াত $ayahNumber / $totalAyah"
+                        : "আপনার কুরআন পাঠ শুরু করুন",
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _continueReading,
+                      icon: Icon(
+                        hasLastRead
+                            ? Icons.play_arrow
+                            : Icons.menu_book,
+                      ),
+                      label: Text(
+                        hasLastRead
+                            ? "পাঠ চালিয়ে যান"
+                            : "কুরআন পড়ুন",
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+

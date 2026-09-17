@@ -1,0 +1,120 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../../features/daily/services/daily_content_service.dart';
+
+class NotificationService {
+  NotificationService._();
+
+  static final NotificationService instance = NotificationService._();
+
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
+
+  final DailyContentService _dailyContentService =
+      DailyContentService();
+
+  Future<void> initialize() async {
+    tz.initializeTimeZones();
+
+    const settings = InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    );
+
+    await _plugin.initialize(
+      settings: settings,
+    );
+
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+  }
+
+  Future<void> scheduleDaily({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+  }) async {
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: _nextTime(hour, minute),
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'daily_islamic_content',
+          'দৈনিক ইসলামিক নোটিফিকেশন',
+          channelDescription:
+              'আয়াত, হাদিস, দোয়া ও আমলের দৈনিক নোটিফিকেশন',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  tz.TZDateTime _nextTime(int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    if (!scheduled.isAfter(now)) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+
+    return scheduled;
+  }
+
+  Future<void> scheduleTodayContent() async {
+    final content = await _dailyContentService.getToday();
+
+    if (content == null) {
+      return;
+    }
+
+    await scheduleDaily(
+      id: 1001,
+      title: '📖 ${content.ayah.title}',
+      body: content.ayah.source,
+      hour: 6,
+      minute: 0,
+    );
+
+    await scheduleDaily(
+      id: 1002,
+      title: '📜 ${content.hadith.title}',
+      body: content.hadith.source,
+      hour: 9,
+      minute: 0,
+    );
+
+    await scheduleDaily(
+      id: 1003,
+      title: '🤲 ${content.dua.title}',
+      body: content.dua.source,
+      hour: 12,
+      minute: 0,
+    );
+
+    await scheduleDaily(
+      id: 1004,
+      title: '🌙 ${content.amal.title}',
+      body: content.amal.source,
+      hour: 15,
+      minute: 0,
+    );
+  }
+}

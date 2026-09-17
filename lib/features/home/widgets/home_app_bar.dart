@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class HomeAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
 
   @override
@@ -14,7 +13,7 @@ class HomeAppBar extends StatelessWidget
       centerTitle: true,
       backgroundColor: const Color(0xFF0A8754),
       title: const Text(
-        "Sirajum Monir",
+        'Sirajum Monir',
         style: TextStyle(
           color: Colors.white,
           fontSize: 22,
@@ -22,15 +21,20 @@ class HomeAppBar extends StatelessWidget
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.menu, color: Colors.white),
+        icon: const Icon(
+          Icons.more_vert,
+          color: Colors.white,
+        ),
         onPressed: () {
           Scaffold.of(context).openDrawer();
         },
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none,
-              color: Colors.white),
+          icon: const Icon(
+            Icons.notifications_none,
+            color: Colors.white,
+          ),
           onPressed: () {},
         ),
       ],
