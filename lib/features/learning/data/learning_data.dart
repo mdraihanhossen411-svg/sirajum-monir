@@ -262,9 +262,10 @@ class LearningData {
 
   static final topics = <String, List<LearningTopic>>{
     for (final entry in _topicTitles.entries)
-      entry.key: [
-        for (final title in entry.value) _placeholder(title),
-      ],
+      if (entry.key != 'আকিদা')
+        entry.key: [
+          for (final title in entry.value) _placeholder(title),
+        ],
 
     'আকিদা': [
       LearningTopic(
