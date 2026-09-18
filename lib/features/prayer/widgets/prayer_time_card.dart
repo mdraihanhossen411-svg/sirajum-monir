@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../controllers/prayer_controller.dart';
 
+import '../controllers/prayer_controller.dart';
+import '../models/prayer_models.dart';
 
 class PrayerTimeCard extends StatelessWidget {
   PrayerTimeCard({super.key});
@@ -20,65 +21,119 @@ class PrayerTimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prayerTimes = _controller.getTodayPrayerTimes();
-
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(
-                  Icons.mosque,
+    return FutureBuilder<PrayerDayTimes>(
+      future: _controller.getTodayPrayerTimes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Card(
+            elevation: 3,
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(
+                child: CircularProgressIndicator(
                   color: Color(0xFF0A8754),
-                  size: 28,
                 ),
-                SizedBox(width: 10),
-                Text(
-                  "নামাজের সময়",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
                   ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'নামাজের সময় লোড করা যায়নি',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final prayerTimes = snapshot.data;
+
+        if (prayerTimes == null) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Text('নামাজের সময় পাওয়া যায়নি'),
+            ),
+          );
+        }
+
+        return Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.mosque,
+                      color: Color(0xFF0A8754),
+                      size: 28,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'নামাজের সময়',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 15),
+
+                _PrayerTimeRow(
+                  name: prayerTimes.fajr.name,
+                  time: _formatTime(prayerTimes.fajr.time),
+                ),
+
+                _PrayerTimeRow(
+                  name: prayerTimes.dhuhr.name,
+                  time: _formatTime(prayerTimes.dhuhr.time),
+                ),
+
+                _PrayerTimeRow(
+                  name: prayerTimes.asr.name,
+                  time: _formatTime(prayerTimes.asr.time),
+                ),
+
+                _PrayerTimeRow(
+                  name: prayerTimes.maghrib.name,
+                  time: _formatTime(prayerTimes.maghrib.time),
+                ),
+
+                _PrayerTimeRow(
+                  name: prayerTimes.isha.name,
+                  time: _formatTime(prayerTimes.isha.time),
                 ),
               ],
             ),
-
-            const SizedBox(height: 15),
-
-            _PrayerTimeRow(
-              name: prayerTimes.fajr.name,
-              time: _formatTime(prayerTimes.fajr.time),
-            ),
-
-            _PrayerTimeRow(
-              name: prayerTimes.dhuhr.name,
-              time: _formatTime(prayerTimes.dhuhr.time),
-            ),
-
-            _PrayerTimeRow(
-              name: prayerTimes.asr.name,
-              time: _formatTime(prayerTimes.asr.time),
-            ),
-
-            _PrayerTimeRow(
-              name: prayerTimes.maghrib.name,
-              time: _formatTime(prayerTimes.maghrib.time),
-            ),
-
-            _PrayerTimeRow(
-              name: prayerTimes.isha.name,
-              time: _formatTime(prayerTimes.isha.time),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

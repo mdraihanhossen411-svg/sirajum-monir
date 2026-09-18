@@ -1,0 +1,379 @@
+import 'package:flutter/material.dart';
+
+class LearningPage extends StatelessWidget {
+  const LearningPage({super.key});
+
+  static const green = Color(0xFF087A3B);
+  static const deepGreen = Color(0xFF063B25);
+  static const gold = Color(0xFFC9A227);
+  static const cream = Color(0xFFFFFCF4);
+
+  static const categories = <Map<String, dynamic>>[
+    {'title': 'আকিদা', 'icon': Icons.menu_book_outlined},
+    {'title': 'ঈমান ও ইসলাম', 'icon': Icons.verified_outlined},
+    {'title': 'নামাজ শিক্ষা', 'icon': Icons.mosque_outlined},
+    {'title': 'ওযু ও পবিত্রতা', 'icon': Icons.water_drop_outlined},
+    {'title': 'রোজা শিক্ষা', 'icon': Icons.nightlight_round},
+    {'title': 'যাকাত শিক্ষা', 'icon': Icons.volunteer_activism_outlined},
+    {'title': 'হজ ও উমরাহ', 'icon': Icons.flight_takeoff_outlined},
+    {'title': 'কুরআন শিক্ষা', 'icon': Icons.auto_stories_outlined},
+    {'title': 'হাদিস শিক্ষা', 'icon': Icons.library_books_outlined},
+    {'title': 'দোয়া ও যিকির', 'icon': Icons.favorite_border},
+    {'title': 'ইসলামী আদব', 'icon': Icons.self_improvement_outlined},
+    {'title': 'পরিবার ও সামাজিক জীবন', 'icon': Icons.family_restroom},
+    {'title': 'শিশুদের ইসলামিক শিক্ষা', 'icon': Icons.child_care_outlined},
+    {'title': 'প্রশ্নোত্তর', 'icon': Icons.question_answer_outlined},
+  ];
+
+  void _openCategory(BuildContext context, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LearningTopicPage(categoryTitle: title),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ইসলামিক শিক্ষা'),
+        backgroundColor: green,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: cream,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 24),
+          children: [
+            Card(
+              elevation: 0,
+              color: deepGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.school_outlined, color: gold, size: 32),
+                    SizedBox(height: 10),
+                    Text(
+                      'ইসলামিক শিক্ষা',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'বিষয় নির্বাচন করুন এবং ধাপে ধাপে শিখুন',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...categories.map(
+              (category) => Card(
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 9),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: gold, width: 0.7),
+                ),
+                child: ListTile(
+                  leading: Icon(
+                    category['icon'] as IconData,
+                    color: green,
+                  ),
+                  title: Text(
+                    category['title'] as String,
+                    style: const TextStyle(
+                      color: deepGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 15,
+                    color: gold,
+                  ),
+                  onTap: () => _openCategory(
+                    context,
+                    category['title'] as String,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LearningTopicPage extends StatelessWidget {
+  const LearningTopicPage({
+    super.key,
+    required this.categoryTitle,
+  });
+
+  final String categoryTitle;
+
+  static const green = Color(0xFF087A3B);
+  static const deepGreen = Color(0xFF063B25);
+  static const gold = Color(0xFFC9A227);
+  static const cream = Color(0xFFFFFCF4);
+
+  static const topicMap = <String, List<String>>{
+    'আকিদা': [
+      'আহলে সুন্নাতের আকিদা',
+      'তাওহিদ',
+      'রিসালাত',
+      'আখিরাত',
+    ],
+    'ঈমান ও ইসলাম': [
+      'ঈমানের বিষয়সমূহ',
+      'ইসলামের স্তম্ভ',
+      'ঈমানের বৃদ্ধি ও হ্রাস',
+    ],
+    'নামাজ শিক্ষা': [
+      'নামাজের পরিচয়',
+      'নামাজের ফরজ',
+      'নামাজের ওয়াজিব',
+      'নামাজের সুন্নত',
+      'নামাজের মাকরূহ',
+      'নামাজের ভুল-ত্রুটি',
+      'জামাতের বিধান',
+    ],
+    'ওযু ও পবিত্রতা': [
+      'ওযুর নিয়ম',
+      'ওযুর ফরজ',
+      'ওযুর সুন্নত',
+      'ওযু ভঙ্গের কারণ',
+      'গোসল',
+      'তায়াম্মুম',
+    ],
+    'রোজা শিক্ষা': [
+      'রোজার পরিচয়',
+      'রোজার ফরজ',
+      'রোজা ভঙ্গের কারণ',
+      'সাহরি ও ইফতার',
+      'তারাবিহ',
+    ],
+    'যাকাত শিক্ষা': [
+      'যাকাতের পরিচয়',
+      'যাকাতের ফরজ',
+      'যাকাতের হিসাব',
+      'যাকাতের হকদার',
+    ],
+    'হজ ও উমরাহ': [
+      'হজের পরিচয়',
+      'হজের ফরজ',
+      'হজের ওয়াজিব',
+      'উমরাহ',
+      'ইহরাম',
+      'তাওয়াফ',
+    ],
+    'কুরআন শিক্ষা': [
+      'কুরআন পরিচিতি',
+      'তিলাওয়াতের আদব',
+      'মাখারিজ',
+      'তাজবিদ',
+    ],
+    'হাদিস শিক্ষা': [
+      'হাদিসের পরিচয়',
+      'হাদিসের প্রকার',
+      'হাদিস সংরক্ষণ',
+      'হাদিসের আদব',
+    ],
+    'দোয়া ও যিকির': [
+      'সকাল-সন্ধ্যার যিকির',
+      'নামাজের পরের যিকির',
+      'ঘুমের দোয়া',
+      'খাবারের দোয়া',
+      'সফরের দোয়া',
+    ],
+    'ইসলামী আদব': [
+      'সালামের আদব',
+      'খাওয়ার আদব',
+      'পোশাকের আদব',
+      'মেহমানের আদব',
+      'মসজিদের আদব',
+    ],
+    'পরিবার ও সামাজিক জীবন': [
+      'পিতা-মাতার অধিকার',
+      'স্বামী-স্ত্রীর অধিকার',
+      'সন্তানের অধিকার',
+      'আত্মীয়তার সম্পর্ক',
+    ],
+    'শিশুদের ইসলামিক শিক্ষা': [
+      'শিশুদের ঈমান শিক্ষা',
+      'নামাজ শিক্ষা',
+      'দোয়া শিক্ষা',
+      'ইসলামী আদব',
+    ],
+    'প্রশ্নোত্তর': [
+      'আকিদা',
+      'ইবাদত',
+      'নামাজ',
+      'রোজা',
+      'পরিবার ও সমাজ',
+    ],
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final topics = topicMap[categoryTitle] ?? const <String>[];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(categoryTitle),
+        backgroundColor: green,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: cream,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: topics.length,
+          itemBuilder: (context, index) {
+            final topic = topics[index];
+
+            return Card(
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 9),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: gold, width: 0.7),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: green,
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                title: Text(
+                  topic,
+                  style: const TextStyle(
+                    color: deepGreen,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                trailing: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: gold,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LearningDetailPage(
+                        categoryTitle: categoryTitle,
+                        topicTitle: topic,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class LearningDetailPage extends StatelessWidget {
+  const LearningDetailPage({
+    super.key,
+    required this.categoryTitle,
+    required this.topicTitle,
+  });
+
+  final String categoryTitle;
+  final String topicTitle;
+
+  static const green = Color(0xFF087A3B);
+  static const deepGreen = Color(0xFF063B25);
+  static const gold = Color(0xFFC9A227);
+  static const cream = Color(0xFFFFFCF4);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(topicTitle),
+        backgroundColor: green,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: cream,
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: gold, width: 1),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  categoryTitle,
+                  style: const TextStyle(
+                    color: green,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  topicTitle,
+                  style: const TextStyle(
+                    color: deepGreen,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Divider(color: gold),
+                const SizedBox(height: 18),
+                const Center(
+                  child: Icon(
+                    Icons.menu_book_outlined,
+                    size: 60,
+                    color: green,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'এই বিষয়ের যাচাই করা ইসলামিক কনটেন্ট পরবর্তীতে এখানে যুক্ত করা হবে।',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.7,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

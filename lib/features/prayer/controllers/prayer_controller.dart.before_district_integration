@@ -1,0 +1,40 @@
+import '../../../core/location/location_service.dart';
+import '../models/prayer_models.dart';
+import '../services/adhan_service.dart';
+
+class PrayerController {
+  final AdhanService _adhanService = AdhanService();
+  final LocationService _locationService = LocationService();
+
+  Future<PrayerDayTimes> getTodayPrayerTimes() async {
+    final now = DateTime.now();
+
+    final position = await _locationService.getCurrentPosition();
+
+    if (position != null) {
+      _adhanService.setLocation(
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+    }
+
+    final times = _adhanService.getTodayPrayerTimes();
+
+    return PrayerDayTimes(
+      date: now,
+      location: position != null
+          ? '${position.latitude.toStringAsFixed(4)}, '
+              '${position.longitude.toStringAsFixed(4)}'
+          : 'ঢাকা, বাংলাদেশ',
+      fajr: times.fajr,
+      dhuhr: times.dhuhr,
+      asr: times.asr,
+      maghrib: times.maghrib,
+      isha: times.isha,
+      sunrise: times.sunrise,
+      sunset: times.sunset,
+      solarNoon: times.solarNoon,
+      forbiddenTimes: times.forbiddenTimes,
+    );
+  }
+}

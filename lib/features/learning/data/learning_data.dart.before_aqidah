@@ -1,0 +1,89 @@
+import '../models/learning_category.dart';
+import '../models/learning_topic.dart';
+
+class LearningData {
+  static const categories = <LearningCategory>[
+    LearningCategory(
+      title: 'আকিদা',
+      description: 'আহলে সুন্নাতের আকিদা ও ঈমানের মৌলিক বিষয়',
+      iconName: 'menu_book',
+    ),
+    LearningCategory(
+      title: 'ঈমান ও ইসলাম',
+      description: 'ঈমান ও ইসলামের মৌলিক শিক্ষা',
+      iconName: 'verified',
+    ),
+    LearningCategory(
+      title: 'নামাজ শিক্ষা',
+      description: 'নামাজের প্রয়োজনীয় মাসআলা ও আদব',
+      iconName: 'mosque',
+    ),
+    LearningCategory(
+      title: 'ওযু ও পবিত্রতা',
+      description: 'পবিত্রতা, ওযু, গোসল ও তায়াম্মুম',
+      iconName: 'water_drop',
+    ),
+    LearningCategory(
+      title: 'রোজা শিক্ষা',
+      description: 'রোজার প্রয়োজনীয় শিক্ষা ও মাসআলা',
+      iconName: 'nightlight',
+    ),
+    LearningCategory(
+      title: 'যাকাত শিক্ষা',
+      description: 'যাকাতের মৌলিক শিক্ষা ও হিসাবের কাঠামো',
+      iconName: 'volunteer_activism',
+    ),
+    LearningCategory(
+      title: 'হজ ও উমরাহ',
+      description: 'হজ ও উমরাহর মৌলিক শিক্ষা',
+      iconName: 'flight',
+    ),
+    LearningCategory(
+      title: 'কুরআন শিক্ষা',
+      description: 'কুরআন তিলাওয়াত ও শিক্ষার ভিত্তি',
+      iconName: 'auto_stories',
+    ),
+    LearningCategory(
+      title: 'হাদিস শিক্ষা',
+      description: 'হাদিসের পরিচয় ও প্রাথমিক শিক্ষা',
+      iconName: 'library_books',
+    ),
+    LearningCategory(
+      title: 'দোয়া ও যিকির',
+      description: 'দৈনন্দিন দোয়া ও যিকির শেখার বিভাগ',
+      iconName: 'favorite',
+    ),
+    LearningCategory(
+      title: 'ইসলামী আদব',
+      description: 'ব্যক্তিগত ও সামাজিক ইসলামী আদব',
+      iconName: 'self_improvement',
+    ),
+    LearningCategory(
+      title: 'পরিবার ও সামাজিক জীবন',
+      description: 'পরিবার ও সমাজে ইসলামী দায়িত্ব',
+      iconName: 'family',
+    ),
+    LearningCategory(
+      title: 'শিশুদের ইসলামিক শিক্ষা',
+      description: 'শিশুদের জন্য মৌলিক ইসলামী শিক্ষা',
+      iconName: 'child_care',
+    ),
+    LearningCategory(
+      title: 'প্রশ্নোত্তর',
+      description: 'বিষয়ভিত্তিক ইসলামী প্রশ্নোত্তর',
+      iconName: 'question_answer',
+    ),
+  ];
+
+  static const topics = <String, List<LearningTopic>>{};
+
+  static LearningTopic placeholder(String title) {
+    return LearningTopic(
+      title: title,
+      introduction: 'এই বিষয়ের যাচাই করা শিক্ষামূলক content এখানে যুক্ত হবে।',
+      mainLesson: 'মূল শিক্ষা পরবর্তী Data & Functionality ধাপে যুক্ত হবে।',
+      references: const [],
+      content: '',
+    );
+  }
+}

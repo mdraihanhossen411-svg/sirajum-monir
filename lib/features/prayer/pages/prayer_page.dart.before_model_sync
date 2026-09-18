@@ -1,0 +1,574 @@
+import 'package:flutter/material.dart';
+
+import '../controllers/prayer_controller.dart';
+import '../models/prayer_models.dart';
+
+class PrayerPage extends StatefulWidget {
+  const PrayerPage({super.key});
+
+  @override
+  State<PrayerPage> createState() => _PrayerPageState();
+}
+
+class _PrayerPageState extends State<PrayerPage> {
+  final PrayerController _controller = PrayerController();
+
+  late Future<PrayerDayTimes> _prayerTimesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrayerTimes();
+  }
+
+  void _loadPrayerTimes() {
+    _prayerTimesFuture = _controller.getTodayPrayerTimes();
+  }
+
+  Future<void> _refresh() async {
+    setState(_loadPrayerTimes);
+    await _prayerTimesFuture;
+  }
+
+  String _formatTime(DateTime time) {
+    final hour = time.hour;
+    final minute = time.minute;
+
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour % 12 == 0 ? 12 : hour % 12;
+
+    return '${displayHour.toString().padLeft(2, '0')}:'
+        '${minute.toString().padLeft(2, '0')} $period';
+  }
+
+  List<PrayerTime> _prayers(PrayerDayTimes times) {
+    return [
+      times.fajr,
+      times.sunrise,
+      times.dhuhr,
+      times.asr,
+      times.maghrib,
+      times.isha,
+    ];
+  }
+
+  PrayerTime _getNextPrayer(PrayerDayTimes times) {
+    final now = DateTime.now();
+
+    final prayers = _prayers(times);
+
+    for (final prayer in prayers) {
+      if (prayer.time.isAfter(now)) {
+        return prayer;
+      }
+    }
+
+    return PrayerTime(
+      name: 'ফজর',
+      time: times.fajr.time.add(const Duration(days: 1)),
+    );
+  }
+
+  String? _getForbiddenTimeName(PrayerDayTimes times) {
+    final now = DateTime.now();
+
+    // ১. সূর্যোদয়ের পর প্রায় ২০ মিনিট
+    final sunriseStart = times.sunrise.time;
+    final sunriseEnd =
+        times.sunrise.time.add(const Duration(minutes: 20));
+
+    if (!now.isBefore(sunriseStart) && now.isBefore(sunriseEnd)) {
+      return 'সূর্যোদয়ের পর নিষিদ্ধ সময়';
+    }
+
+    // ২. যোহরের প্রায় ১০ মিনিট আগে থেকে যোহর শুরু হওয়া পর্যন্ত
+    final zawalStart =
+        times.dhuhr.time.subtract(const Duration(minutes: 10));
+    final zawalEnd = times.dhuhr.time;
+
+    if (!now.isBefore(zawalStart) && now.isBefore(zawalEnd)) {
+      return 'জাওয়াল / মধ্যাকাশের নিষিদ্ধ সময়';
+    }
+
+    // ৩. সূর্যাস্তের প্রায় ২০ মিনিট আগে থেকে সূর্যাস্ত পর্যন্ত
+    final sunsetStart =
+        times.maghrib.time.subtract(const Duration(minutes: 20));
+    final sunsetEnd = times.maghrib.time;
+
+    if (!now.isBefore(sunsetStart) && now.isBefore(sunsetEnd)) {
+      return 'সূর্যাস্তের নিষিদ্ধ সময়';
+    }
+
+    return null;
+  }
+
+  String _getCurrentPeriod(PrayerDayTimes times) {
+    final now = DateTime.now();
+
+    final forbidden = _getForbiddenTimeName(times);
+    if (forbidden != null) {
+      return forbidden;
+    }
+
+    if (now.isBefore(times.sunrise.time)) {
+      if (now.isBefore(times.fajr.time)) {
+        return 'এখনো ফজরের সময় শুরু হয়নি';
+      }
+      return 'ফজর';
+    }
+
+    if (now.isBefore(times.dhuhr.time)) {
+      return 'সূর্যোদয়';
+    }
+
+    if (now.isBefore(times.asr.time)) {
+      return 'যোহর';
+    }
+
+    if (now.isBefore(times.maghrib.time)) {
+      return 'আসর';
+    }
+
+    if (now.isBefore(times.isha.time)) {
+      return 'মাগরিব';
+    }
+
+    return 'এশা';
+  }
+
+  Color _currentColor(PrayerDayTimes times) {
+    return _getForbiddenTimeName(times) != null
+        ? Colors.red.shade700
+        : const Color(0xFF0A8754);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('নামাজের সময়'),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF0A8754),
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            onPressed: _refresh,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'সময় আপডেট করুন',
+          ),
+        ],
+      ),
+      body: FutureBuilder<PrayerDayTimes>(
+        future: _prayerTimesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF0A8754),
+              ),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.redAccent,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'নামাজের সময় লোড করা যায়নি',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(_loadPrayerTimes);
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('আবার চেষ্টা করুন'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final prayerTimes = snapshot.data;
+
+          if (prayerTimes == null) {
+            return const Center(
+              child: Text('নামাজের সময় পাওয়া যায়নি'),
+            );
+          }
+
+          final nextPrayer = _getNextPrayer(prayerTimes);
+          final currentPeriod = _getCurrentPeriod(prayerTimes);
+          final forbiddenTime = _getForbiddenTimeName(prayerTimes);
+          final currentColor = _currentColor(prayerTimes);
+
+          return RefreshIndicator(
+            color: const Color(0xFF0A8754),
+            onRefresh: _refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_month,
+                                color: Color(0xFF0A8754),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'আজকের নামাজের সময়',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Divider(),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: Color(0xFF0A8754),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  prayerTimes.location,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Card(
+                    elevation: 3,
+                    color: forbiddenTime != null
+                        ? Colors.red.shade50
+                        : const Color(0xFFE8F5E9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 18,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  forbiddenTime != null
+                                      ? 'নিষিদ্ধ সময়'
+                                      : 'এখন নামাজ',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: currentColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  currentPeriod,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: currentColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                if (forbiddenTime == null)
+                                  Text(
+                                    _getCurrentPrayerTime(
+                                      prayerTimes,
+                                      currentPeriod,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else
+                                  const Text(
+                                    'সালাত আদায় করবেন না',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+
+                          Container(
+                            width: 1,
+                            height: 70,
+                            color: Colors.grey.shade300,
+                          ),
+
+                          Expanded(
+                            child: Column(
+                              children: [
+                                const Text(
+                                  'পরবর্তী নামাজ',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  nextPrayer.name,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatTime(nextPrayer.time),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0A8754),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    '৫ ওয়াক্ত নামাজ',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  _PrayerTimeCard(
+                    icon: Icons.wb_twilight,
+                    prayer: prayerTimes.fajr,
+                    formatTime: _formatTime,
+                  ),
+
+                  _PrayerTimeCard(
+                    icon: Icons.wb_sunny,
+                    prayer: prayerTimes.dhuhr,
+                    formatTime: _formatTime,
+                  ),
+
+                  _PrayerTimeCard(
+                    icon: Icons.sunny,
+                    prayer: prayerTimes.asr,
+                    formatTime: _formatTime,
+                  ),
+
+                  _PrayerTimeCard(
+                    icon: Icons.wb_twilight,
+                    prayer: prayerTimes.maghrib,
+                    formatTime: _formatTime,
+                  ),
+
+                  _PrayerTimeCard(
+                    icon: Icons.nightlight_round,
+                    prayer: prayerTimes.isha,
+                    formatTime: _formatTime,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.wb_sunny_outlined,
+                        color: Color(0xFF0A8754),
+                        size: 30,
+                      ),
+                      title: const Text(
+                        'সূর্যোদয়',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      trailing: Text(
+                        _formatTime(prayerTimes.sunrise.time),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF0A8754),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'নামাজের সময় স্থান ও তারিখ অনুযায়ী পরিবর্তিত হয়। '
+                              'আপনার বর্তমান অবস্থান অনুযায়ী সময় গণনা করা হচ্ছে।',
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _getCurrentPrayerTime(
+    PrayerDayTimes times,
+    String currentPeriod,
+  ) {
+    switch (currentPeriod) {
+      case 'ফজর':
+        return _formatTime(times.fajr.time);
+      case 'সূর্যোদয়':
+        return _formatTime(times.sunrise.time);
+      case 'যোহর':
+        return _formatTime(times.dhuhr.time);
+      case 'আসর':
+        return _formatTime(times.asr.time);
+      case 'মাগরিব':
+        return _formatTime(times.maghrib.time);
+      case 'এশা':
+        return _formatTime(times.isha.time);
+      default:
+        return '';
+    }
+  }
+}
+
+class _PrayerTimeCard extends StatelessWidget {
+  final IconData icon;
+  final PrayerTime prayer;
+  final String Function(DateTime) formatTime;
+
+  const _PrayerTimeCard({
+    required this.icon,
+    required this.prayer,
+    required this.formatTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 6,
+        ),
+        leading: Icon(
+          icon,
+          color: const Color(0xFF0A8754),
+          size: 30,
+        ),
+        title: Text(
+          prayer.name,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        trailing: Text(
+          formatTime(prayer.time),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}

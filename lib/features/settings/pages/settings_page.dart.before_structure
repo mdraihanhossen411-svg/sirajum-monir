@@ -1,0 +1,283 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/theme/theme_controller.dart';
+import '../../prayer/controllers/prayer_notification_controller.dart';
+
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final ThemeController _themeController =
+      ThemeController.instance;
+
+  final PrayerNotificationController
+      _prayerNotificationController =
+      PrayerNotificationController();
+
+  bool _prayerNotificationsEnabled = true;
+  bool _loadingPrayerNotification = true;
+
+  final Map<int, bool> _prayerEnabled = {
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+  };
+
+  static const Map<int, String> _prayerNames = {
+    1: 'ফজর',
+    2: 'যোহর',
+    3: 'আসর',
+    4: 'মাগরিব',
+    5: 'এশা',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrayerNotificationSetting();
+  }
+
+  Future<void> _loadPrayerNotificationSetting() async {
+    final enabled =
+        await _prayerNotificationController.isEnabled();
+
+    final prayerSettings = <int, bool>{};
+
+    for (final prayerType in _prayerNames.keys) {
+      prayerSettings[prayerType] =
+          await _prayerNotificationController
+              .isPrayerEnabled(prayerType);
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _prayerNotificationsEnabled = enabled;
+      _prayerEnabled
+        ..clear()
+        ..addAll(prayerSettings);
+      _loadingPrayerNotification = false;
+    });
+  }
+
+  Future<void> _togglePrayerNotification(
+    bool value,
+  ) async {
+    setState(() {
+      _prayerNotificationsEnabled = value;
+    });
+
+    try {
+      await _prayerNotificationController.setEnabled(value);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            value
+                ? 'নামাজের সময়ের notification চালু হয়েছে'
+                : 'নামাজের সময়ের notification বন্ধ হয়েছে',
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _prayerNotificationsEnabled = !value;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Notification setting পরিবর্তন করা যায়নি',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _toggleIndividualPrayer(
+    int prayerType,
+    bool value,
+  ) async {
+    setState(() {
+      _prayerEnabled[prayerType] = value;
+    });
+
+    try {
+      await _prayerNotificationController
+          .setPrayerEnabled(
+        prayerType,
+        value,
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _prayerEnabled[prayerType] = !value;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'নামাজের notification setting পরিবর্তন করা যায়নি',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('সেটিংস'),
+        centerTitle: true,
+      ),
+      body: AnimatedBuilder(
+        animation: _themeController,
+        builder: (context, _) {
+          final currentMode =
+              _themeController.themeMode;
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Card(
+                child: Column(
+                  children: [
+                    const ListTile(
+                      leading: Icon(
+                        Icons.palette_outlined,
+                      ),
+                      title: Text(
+                        'অ্যাপের থিম',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'পুরো অ্যাপের Light, Dark অথবা System থিম নির্বাচন করুন',
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    RadioGroup<ThemeMode>(
+                      groupValue: currentMode,
+                      onChanged: (value) {
+                        if (value != null) {
+                          _themeController
+                              .setThemeMode(value);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          RadioListTile<ThemeMode>(
+                            value: ThemeMode.light,
+                            title: const Text('Light Mode'),
+                            subtitle:
+                                const Text('হালকা থিম'),
+                            secondary: const Icon(
+                              Icons.light_mode_rounded,
+                            ),
+                          ),
+                          RadioListTile<ThemeMode>(
+                            value: ThemeMode.dark,
+                            title: const Text('Dark Mode'),
+                            subtitle:
+                                const Text('ডার্ক থিম'),
+                            secondary: const Icon(
+                              Icons.dark_mode_rounded,
+                            ),
+                          ),
+                          RadioListTile<ThemeMode>(
+                            value: ThemeMode.system,
+                            title:
+                                const Text('System Default'),
+                            subtitle: const Text(
+                              'ফোনের থিম অনুযায়ী স্বয়ংক্রিয়ভাবে পরিবর্তন হবে',
+                            ),
+                            secondary: const Icon(
+                              Icons.settings_brightness_rounded,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Card(
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      secondary: const Icon(
+                        Icons.notifications_active_outlined,
+                      ),
+                      title: const Text(
+                        'নামাজের সময়ের Notification',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'পাঁচ ওয়াক্তের নামাজের সময় notification নিয়ন্ত্রণ করুন',
+                      ),
+                      value: _prayerNotificationsEnabled,
+                      onChanged: _loadingPrayerNotification
+                          ? null
+                          : _togglePrayerNotification,
+                    ),
+
+                    if (_prayerNotificationsEnabled &&
+                        !_loadingPrayerNotification) ...[
+                      const Divider(height: 1),
+
+                      for (final entry in _prayerNames.entries)
+                        SwitchListTile(
+                          contentPadding:
+                              const EdgeInsets.only(
+                            left: 24,
+                            right: 16,
+                          ),
+                          secondary: const Icon(
+                            Icons.mosque_outlined,
+                            size: 21,
+                          ),
+                          title: Text(
+                            '${entry.value} নামাজ',
+                          ),
+                          subtitle: const Text(
+                            'নামাজের সময় notification',
+                          ),
+                          value:
+                              _prayerEnabled[entry.key] ?? true,
+                          onChanged: (value) {
+                            _toggleIndividualPrayer(
+                              entry.key,
+                              value,
+                            );
+                          },
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

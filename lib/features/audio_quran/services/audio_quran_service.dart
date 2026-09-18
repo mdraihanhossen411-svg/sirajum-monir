@@ -1,0 +1,3 @@
+class AudioQuranService {
+  void dispose() {}
+}

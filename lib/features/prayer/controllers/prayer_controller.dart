@@ -1,47 +1,80 @@
+import '../../../core/location/location_service.dart';
+import '../models/bangladesh_location.dart';
 import '../models/prayer_models.dart';
 import '../services/adhan_service.dart';
+import 'prayer_location_controller.dart';
 
 class PrayerController {
   final AdhanService _adhanService = AdhanService();
+  final LocationService _locationService = LocationService();
+  final PrayerLocationController _locationController =
+      PrayerLocationController();
 
-  PrayerDayTimes getTodayPrayerTimes() {
+  Future<PrayerDayTimes> getTodayPrayerTimes({
+    bool useGps = false,
+  }) async {
     final now = DateTime.now();
+
+    if (useGps) {
+      final position = await _locationService.getCurrentPosition();
+
+      if (position != null) {
+        _adhanService.setLocation(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+
+        final times = _adhanService.getTodayPrayerTimes();
+
+        return PrayerDayTimes(
+          date: now,
+          location:
+              'বর্তমান অবস্থান\n'
+              '${position.latitude.toStringAsFixed(4)}, '
+              '${position.longitude.toStringAsFixed(4)}',
+          fajr: times.fajr,
+          dhuhr: times.dhuhr,
+          asr: times.asr,
+          maghrib: times.maghrib,
+          isha: times.isha,
+          sunrise: times.sunrise,
+          sunset: times.sunset,
+          solarNoon: times.solarNoon,
+          forbiddenTimes: times.forbiddenTimes,
+        );
+      }
+    }
+
+    final BangladeshLocation selected =
+        await _locationController.getSelectedLocation();
+
+    _adhanService.setLocation(
+      latitude: selected.latitude,
+      longitude: selected.longitude,
+    );
 
     final times = _adhanService.getTodayPrayerTimes();
 
     return PrayerDayTimes(
       date: now,
-      location: 'বাংলাদেশ',
-
-      fajr: PrayerTime(
-        name: 'ফজর',
-        time: times.fajr,
-      ),
-
-      sunrise: PrayerTime(
-        name: 'সূর্যোদয়',
-        time: times.sunrise,
-      ),
-
-      dhuhr: PrayerTime(
-        name: 'যোহর',
-        time: times.dhuhr,
-      ),
-
-      asr: PrayerTime(
-        name: 'আসর',
-        time: times.asr,
-      ),
-
-      maghrib: PrayerTime(
-        name: 'মাগরিব',
-        time: times.maghrib,
-      ),
-
-      isha: PrayerTime(
-        name: 'এশা',
-        time: times.isha,
-      ),
+      location: '${selected.division} বিভাগ, ${selected.district} জেলা',
+      fajr: times.fajr,
+      dhuhr: times.dhuhr,
+      asr: times.asr,
+      maghrib: times.maghrib,
+      isha: times.isha,
+      sunrise: times.sunrise,
+      sunset: times.sunset,
+      solarNoon: times.solarNoon,
+      forbiddenTimes: times.forbiddenTimes,
     );
+  }
+
+  Future<BangladeshLocation> getSelectedLocation() {
+    return _locationController.getSelectedLocation();
+  }
+
+  Future<void> saveLocation(BangladeshLocation location) {
+    return _locationController.saveLocation(location);
   }
 }

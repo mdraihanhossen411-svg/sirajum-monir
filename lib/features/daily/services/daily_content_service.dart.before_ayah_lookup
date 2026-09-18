@@ -1,0 +1,40 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+import '../models/daily_content_model.dart';
+
+class DailyContentService {
+  static const String _assetPath =
+      'assets/json/daily/daily_content.json';
+
+  Future<Map<String, dynamic>> _loadData() async {
+    final jsonString = await rootBundle.loadString(_assetPath);
+
+    return json.decode(jsonString) as Map<String, dynamic>;
+  }
+
+  Future<DailyContent?> getForDate(DateTime date) async {
+    final data = await _loadData();
+
+    final dayOfYear =
+        date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+
+    final item = data[dayOfYear.toString()];
+
+    if (item == null) {
+      return null;
+    }
+
+    return DailyContent.fromJson(
+      Map<String, dynamic>.from(item),
+    );
+  }
+
+  Future<DailyContent?> getToday() async {
+    final now = tz.TZDateTime.now(tz.local);
+
+    return getForDate(now);
+  }
+}

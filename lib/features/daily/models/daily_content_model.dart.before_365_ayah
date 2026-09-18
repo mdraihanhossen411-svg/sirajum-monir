@@ -1,0 +1,47 @@
+class DailyItem {
+  final String title;
+  final String source;
+
+  const DailyItem({
+    required this.title,
+    required this.source,
+  });
+
+  factory DailyItem.fromJson(Map<String, dynamic> json) {
+    return DailyItem(
+      title: json['title'] ?? '',
+      source: json['source'] ?? '',
+    );
+  }
+}
+
+class DailyContent {
+  final DailyItem ayah;
+  final DailyItem hadith;
+  final DailyItem dua;
+  final DailyItem amal;
+
+  const DailyContent({
+    required this.ayah,
+    required this.hadith,
+    required this.dua,
+    required this.amal,
+  });
+
+  factory DailyContent.fromJson(Map<String, dynamic> json) {
+    return DailyContent(
+      ayah: DailyItem.fromJson(
+        Map<String, dynamic>.from(json['ayah'] ?? {}),
+      ),
+      hadith: DailyItem.fromJson(
+        Map<String, dynamic>.from(json['hadith'] ?? {}),
+      ),
+      dua: DailyItem.fromJson(
+        Map<String, dynamic>.from(json['dua'] ?? {}),
+      ),
+      amal: DailyItem.fromJson(
+        Map<String, dynamic>.from(json['amal'] ?? {}),
+      ),
+    );
+  }
+}

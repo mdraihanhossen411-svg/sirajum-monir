@@ -1,0 +1,44 @@
+import 'package:adhan/adhan.dart';
+
+class AdhanService {
+  static final AdhanService _instance = AdhanService._internal();
+
+  factory AdhanService() => _instance;
+
+  AdhanService._internal();
+
+  // Default location: Dhaka, Bangladesh.
+  Coordinates _coordinates = Coordinates(
+    23.8103,
+    90.4125,
+  );
+
+  void setLocation({
+    required double latitude,
+    required double longitude,
+  }) {
+    _coordinates = Coordinates(latitude, longitude);
+  }
+
+  Coordinates get coordinates => _coordinates;
+
+  PrayerTimes getPrayerTimes(DateTime date) {
+    final params = CalculationMethod.karachi.getParameters();
+
+    // Hanafi Asr
+    params.madhab = Madhab.hanafi;
+
+    final dateComponents = DateComponents.from(date);
+
+    return PrayerTimes(
+      _coordinates,
+      dateComponents,
+      params,
+      utcOffset: const Duration(hours: 6),
+    );
+  }
+
+  PrayerTimes getTodayPrayerTimes() {
+    return getPrayerTimes(DateTime.now());
+  }
+}

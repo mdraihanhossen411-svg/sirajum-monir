@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../models/quran_model.dart';
 import '../services/bookmark_service.dart';
+import '../services/last_read_service.dart';
 import '../widgets/ayah_card.dart';
 
 class SurahDetailPage extends StatefulWidget {
@@ -25,10 +27,16 @@ class SurahDetailPage extends StatefulWidget {
 
 class _SurahDetailPageState extends State<SurahDetailPage> {
   final BookmarkService _bookmarkService = BookmarkService();
+  final LastReadService _lastReadService = LastReadService();
 
   List<Map<String, dynamic>> _ayahs = [];
   final Set<String> _bookmarked = <String>{};
-  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemScrollController _itemScrollController =
+      ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
+
+  Timer? _lastReadTimer;
 
   bool _loading = true;
   String? _error;
@@ -81,7 +89,59 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
   void initState() {
     super.initState();
     _highlightAyah = widget.initialAyah;
+    _itemPositionsListener.itemPositions.addListener(
+      _handleVisibleAyahChanged,
+    );
     _load();
+  }
+
+  void _handleVisibleAyahChanged() {
+    if (_ayahs.isEmpty) return;
+
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    ItemPosition? bestPosition;
+
+    for (final position in positions) {
+      final isVisible = position.itemLeadingEdge < 1.0 &&
+          position.itemTrailingEdge > 0.0;
+
+      if (!isVisible) continue;
+
+      if (bestPosition == null ||
+          position.itemLeadingEdge < bestPosition.itemLeadingEdge) {
+        bestPosition = position;
+      }
+    }
+
+    if (bestPosition == null) return;
+
+    final index = bestPosition.index;
+    if (index < 0 || index >= _ayahs.length) return;
+
+    final ayahNumber = _safeInt(_ayahs[index]['number']);
+    if (ayahNumber <= 0) return;
+
+    _lastReadTimer?.cancel();
+
+    _lastReadTimer = Timer(
+      const Duration(milliseconds: 450),
+      () => _saveLastRead(ayahNumber),
+    );
+  }
+
+  Future<void> _saveLastRead(int ayahNumber) async {
+    if (ayahNumber <= 0) return;
+
+    await _lastReadService.save(
+      surahId: widget.surah.id,
+      surahBangla: _safeString(widget.surah.banglaName),
+      surahArabic: _safeString(widget.surah.arabicName),
+      surahEnglish: _safeString(widget.surah.englishName),
+      ayahNumber: ayahNumber,
+      totalAyah: widget.surah.totalAyah,
+    );
   }
 
   Future<void> _load() async {
@@ -535,6 +595,7 @@ Future<void> _toggleBookmark(
                         Expanded(
                           child: ScrollablePositionedList.builder(
                             itemScrollController: _itemScrollController,
+                            itemPositionsListener: _itemPositionsListener,
                             padding: const EdgeInsets.only(
                               top: 4,
                               bottom: 24,
@@ -548,5 +609,14 @@ Future<void> _toggleBookmark(
                       ],
                     ),
     );
+  }
+
+  @override
+  void dispose() {
+    _lastReadTimer?.cancel();
+    _itemPositionsListener.itemPositions.removeListener(
+      _handleVisibleAyahChanged,
+    );
+    super.dispose();
   }
 }
