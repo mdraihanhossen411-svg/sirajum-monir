@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+
+import 'app/app.dart';
+import 'core/notifications/notification_service.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(const SirajumMonirApp());
+
+  // UI শুরু হওয়ার পরে notification system চালু হবে।
+  // এতে Splash/Welcome দেখানোর আগে ভারী initialization আটকে থাকবে না।
+  Future<void>(() async {
+    final notificationService = NotificationService.instance;
+
+    await notificationService.initialize();
+    await notificationService.scheduleUpcomingAyahNotifications(
+      days: 30,
+    );
+  });
+}

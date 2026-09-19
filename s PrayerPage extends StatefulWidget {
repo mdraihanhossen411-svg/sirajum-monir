@@ -1,0 +1,201 @@
+[1mdiff --git a/lib/features/prayer/controllers/prayer_controller.dart b/lib/features/prayer/controllers/prayer_controller.dart[m
+[1mindex ff7bb4f..80afc8b 100644[m
+[1m--- a/lib/features/prayer/controllers/prayer_controller.dart[m
+[1m+++ b/lib/features/prayer/controllers/prayer_controller.dart[m
+[36m@@ -1,47 +1,56 @@[m
+[31m-import '../models/prayer_models.dart';[m
+[31m-import '../services/adhan_service.dart';[m
+[31m-[m
+[31m-class PrayerController {[m
+[31m-  final AdhanService _adhanService = AdhanService();[m
+[31m-[m
+[31m-  PrayerDayTimes getTodayPrayerTimes() {[m
+[31m-    final now = DateTime.now();[m
+[31m-[m
+[31m-    final times = _adhanService.getTodayPrayerTimes();[m
+[31m-[m
+[31m-    return PrayerDayTimes([m
+[31m-      date: now,[m
+[31m-      location: 'বাংলাদেশ',[m
+[31m-[m
+[31m-      fajr: PrayerTime([m
+[31m-        name: 'ফজর',[m
+[31m-        time: times.fajr,[m
+[31m-      ),[m
+[31m-[m
+[31m-      sunrise: PrayerTime([m
+[31m-        name: 'সূর্যোদয়',[m
+[31m-        time: times.sunrise,[m
+[31m-      ),[m
+[31m-[m
+[31m-      dhuhr: PrayerTime([m
+[31m-        name: 'যোহর',[m
+[31m-        time: times.dhuhr,[m
+[31m-      ),[m
+[31m-[m
+[31m-      asr: PrayerTime([m
+[31m-        name: 'আসর',[m
+[31m-        time: times.asr,[m
+[31m-      ),[m
+[31m-[m
+[31m-      maghrib: PrayerTime([m
+[31m-        name: 'মাগরিব',[m
+[31m-        time: times.maghrib,[m
+[31m-      ),[m
+[31m-[m
+[31m-      isha: PrayerTime([m
+[31m-        name: 'এশা',[m
+[31m-        time: times.isha,[m
+[31m-      ),[m
+[31m-    );[m
+[31m-  }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m
+[32m+[m[32mimport '../../../core/location/location_service.dart';[m
+[32m+[m[32mimport '../models/prayer_models.dart';[m
+[32m+[m[32mimport '../services/adhan_service.dart';[m
+[32m+[m
+[32m+[m[32mclass PrayerController {[m
+[32m+[m[32m  final AdhanService _adhanService = AdhanService();[m
+[32m+[m[32m  final LocationService _locationService = LocationService();[m
+[32m+[m
+[32m+[m[32m  Future<PrayerDayTimes> getTodayPrayerTimes() async {[m
+[32m+[m[32m    final now = DateTime.now();[m
+[32m+[m
+[32m+[m[32m    final position = await _locationService.getCurrentPosition();[m
+[32m+[m
+[32m+[m[32m    if (position != null) {[m
+[32m+[m[32m      _adhanService.setLocation([m
+[32m+[m[32m        latitude: position.latitude,[m
+[32m+[m[32m        longitude: position.longitude,[m
+[32m+[m[32m      );[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    final times = _adhanService.getTodayPrayerTimes();[m
+[32m+[m
+[32m+[m[32m    return PrayerDayTimes([m
+[32m+[m[32m      date: now,[m
+[32m+[m[32m      location: position != null[m
+[32m+[m[32m          ? '${position.latitude.toStringAsFixed(4)}, '[m
+[32m+[m[32m              '${position.longitude.toStringAsFixed(4)}'[m
+[32m+[m[32m          : 'ঢাকা, বাংলাদেশ',[m
+[32m+[m[32m      fajr: PrayerTime([m
+[32m+[m[32m        name: 'ফজর',[m
+[32m+[m[32m        time: times.fajr,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      sunrise: PrayerTime([m
+[32m+[m[32m        name: 'সূর্যোদয়',[m
+[32m+[m[32m        time: times.sunrise,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      dhuhr: PrayerTime([m
+[32m+[m[32m        name: 'যোহর',[m
+[32m+[m[32m        time: times.dhuhr,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      asr: PrayerTime([m
+[32m+[m[32m        name: 'আসর',[m
+[32m+[m[32m        time: times.asr,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      maghrib: PrayerTime([m
+[32m+[m[32m        name: 'মাগরিব',[m
+[32m+[m[32m        time: times.maghrib,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      isha: PrayerTime([m
+[32m+[m[32m        name: 'এশা',[m
+[32m+[m[32m        time: times.isha,[m
+[32m+[m[32m      ),[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[1mdiff --git a/lib/features/prayer/services/adhan_service.dart b/lib/features/prayer/services/adhan_service.dart[m
+[1mindex 26a030e..55a76fc 100644[m
+[1m--- a/lib/features/prayer/services/adhan_service.dart[m
+[1m+++ b/lib/features/prayer/services/adhan_service.dart[m
+[36m@@ -1,42 +1,44 @@[m
+[31m-import 'package:flutter/foundation.dart';[m
+[31m-import 'package:adhan/adhan.dart';[m
+[31m-[m
+[31m-class AdhanService {[m
+[31m-  static final AdhanService _instance = AdhanService._internal();[m
+[31m-[m
+[31m-  factory AdhanService() => _instance;[m
+[31m-[m
+[31m-  AdhanService._internal();[m
+[31m-[m
+[31m-  final Coordinates coordinates = Coordinates([m
+[31m-    23.9088,[m
+[31m-    89.1220,[m
+[31m-  );[m
+[31m-[m
+[31m-  PrayerTimes getTodayPrayerTimes() {[m
+[31m-    final params = CalculationMethod.karachi.getParameters();[m
+[31m-[m
+[31m-    // বাংলাদেশে Hanafi পদ্ধতি[m
+[31m-    params.madhab = Madhab.hanafi;[m
+[31m-[m
+[31m-    final date = DateComponents.from(DateTime.now());[m
+[31m-[m
+[31m-    return PrayerTimes([m
+[31m-      coordinates,[m
+[31m-      date,[m
+[31m-      params,[m
+[31m-      utcOffset: const Duration(hours: 6),[m
+[31m-    );[m
+[31m-  }[m
+[31m-[m
+[31m-  void printPrayerTimes() {[m
+[31m-    final times = getTodayPrayerTimes();[m
+[31m-[m
+[31m-    debugPrint('ফজর: ${times.fajr}');[m
+[31m-    debugPrint('সূর্যোদয়: ${times.sunrise}');[m
+[31m-    debugPrint('যোহর: ${times.dhuhr}');[m
+[31m-    debugPrint('আসর: ${times.asr}');[m
+[31m-    debugPrint('মাগরিব: ${times.maghrib}');[m
+[31m-    debugPrint('এশা: ${times.isha}');[m
+[31m-  }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32mimport 'package:adhan/adhan.dart';[m
+[32m+[m
+[32m+[m[32mclass AdhanService {[m
+[32m+[m[32m  static final AdhanService _instance = AdhanService._internal();[m
+[32m+[m
+[32m+[m[32m  factory AdhanService() => _instance;[m
+[32m+[m
+[32m+[m[32m  AdhanService._internal();[m
+[32m+[m
+[32m+[m[32m  // Default location: Dhaka, Bangladesh.[m
+[32m+[m[32m  Coordinates _coordinates = Coordinates([m
+[32m+[m[32m    23.8103,[m
+[32m+[m[32m    90.4125,[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  void setLocation({[m
+[32m+[m[32m    required double latitude,[m
+[32m+[m[32m    required double longitude,[m
+[32m+[m[32m  }) {[m
+[32m+[m[32m    _coordinates = Coordinates(latitude, longitude);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  Coordinates get coordinates => _coordinates;[m
+[32m+[m
+[32m+[m[32m  PrayerTimes getPrayerTimes(DateTime date) {[m
+[32m+[m[32m    final params = CalculationMethod.karachi.getParameters();[m
+[32m+[m
+[32m+[m[32m    // Hanafi Asr[m
+[32m+[m[32m    params.madhab = Madhab.hanafi;[m
+[32m+[m
+[32m+[m[32m    final dateComponents = DateComponents.from(date);[m
+[32m+[m
+[32m+[m[32m    return PrayerTimes([m
+[32m+[m[32m      _coordinates,[m
+[32m+[m[32m      dateComponents,[m
+[32m+[m[32m      params,[m
+[32m+[m[32m      utcOffset: const Duration(hours: 6),[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  PrayerTimes getTodayPrayerTimes() {[m
+[32m+[m[32m    return getPrayerTimes(DateTime.now());[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m

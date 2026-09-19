@@ -1,0 +1,778 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../data/bukhari_ifa_book_01_data.dart';
+import '../models/bukhari_book.dart';
+import '../models/bukhari_hadith.dart';
+
+class BukhariBookChaptersPage extends StatefulWidget {
+  final BukhariBook book;
+
+  const BukhariBookChaptersPage({
+    super.key,
+    required this.book,
+  });
+
+  @override
+  State<BukhariBookChaptersPage> createState() =>
+      _BukhariBookChaptersPageState();
+}
+
+class _BukhariBookChaptersPageState
+    extends State<BukhariBookChaptersPage> {
+  static const _green = Color(0xFF087A3B);
+  static const _deepGreen = Color(0xFF063B25);
+  static const _gold = Color(0xFFC9A227);
+  static const _cream = Color(0xFFFFFCF4);
+  static const _softGreen = Color(0xFFEAF6F0);
+
+  final Set<int> _bookmarked = {};
+  final Set<int> _favorite = {};
+
+  List<BukhariHadith> get _hadiths {
+    if (widget.book.number == 1) {
+      return BukhariIfaBook01Data.hadiths;
+    }
+    return const [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7F5),
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: _green,
+        foregroundColor: Colors.white,
+        titleSpacing: 0,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'সহীহ বুখারী',
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              widget.book.bengaliName,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'অনুসন্ধান',
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('হাদিস অনুসন্ধান শীঘ্রই যুক্ত হবে।'),
+                ),
+              );
+            },
+            icon: const Icon(Icons.search_rounded),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'bookmark') {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('বুকমার্ক তালিকা শীঘ্রই যুক্ত হবে।'),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'bookmark',
+                child: Text('বুকমার্ক'),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: _hadiths.isEmpty
+          ? _buildEmptyState()
+          : ListView.builder(
+              padding: const EdgeInsets.fromLTRB(12, 14, 12, 32),
+              itemCount: _hadiths.length,
+              itemBuilder: (context, index) {
+                return _HadithCard(
+                  hadith: _hadiths[index],
+                  green: _green,
+                  deepGreen: _deepGreen,
+                  gold: _gold,
+                  cream: _cream,
+                  softGreen: _softGreen,
+                  bookmarked:
+                      _bookmarked.contains(_hadiths[index].number),
+                  favorite:
+                      _favorite.contains(_hadiths[index].number),
+                  onBookmark: () {
+                    setState(() {
+                      final number = _hadiths[index].number;
+                      if (_bookmarked.contains(number)) {
+                        _bookmarked.remove(number);
+                      } else {
+                        _bookmarked.add(number);
+                      }
+                    });
+                  },
+                  onFavorite: () {
+                    setState(() {
+                      final number = _hadiths[index].number;
+                      if (_favorite.contains(number)) {
+                        _favorite.remove(number);
+                      } else {
+                        _favorite.add(number);
+                      }
+                    });
+                  },
+                );
+              },
+            ),
+      floatingActionButton: _hadiths.isEmpty
+          ? null
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _FloatingAction(
+                  icon: Icons.fullscreen_rounded,
+                  color: Colors.red.shade600,
+                  tooltip: 'পূর্ণ পর্দা',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('পূর্ণ পর্দা মোড শীঘ্রই যুক্ত হবে।'),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _FloatingAction(
+                  icon: Icons.format_list_bulleted_rounded,
+                  color: Colors.blue.shade600,
+                  tooltip: 'পরিচ্ছেদ তালিকা',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('পরিচ্ছেদ তালিকা শীঘ্রই যুক্ত হবে।'),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _FloatingAction(
+                  icon: Icons.info_outline_rounded,
+                  color: _deepGreen,
+                  tooltip: 'তথ্য',
+                  onTap: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      showDragHandle: true,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            20,
+                            8,
+                            20,
+                            28,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'সহীহ বুখারী',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      color: _green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                widget.book.bengaliName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                widget.book.arabicName,
+                                textDirection: TextDirection.rtl,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  size: 58,
+                  color: _green.withValues(alpha: .75),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '${widget.book.number}. ${widget.book.bengaliName}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: _deepGreen,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.book.arabicName,
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'এই কিতাবের হাদিসের ডাটা এখনো যুক্ত করা হয়নি।',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HadithCard extends StatelessWidget {
+  final BukhariHadith hadith;
+  final Color green;
+  final Color deepGreen;
+  final Color gold;
+  final Color cream;
+  final Color softGreen;
+  final bool bookmarked;
+  final bool favorite;
+  final VoidCallback onBookmark;
+  final VoidCallback onFavorite;
+
+  const _HadithCard({
+    required this.hadith,
+    required this.green,
+    required this.deepGreen,
+    required this.gold,
+    required this.cream,
+    required this.softGreen,
+    required this.bookmarked,
+    required this.favorite,
+    required this.onBookmark,
+    required this.onFavorite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      elevation: 2,
+      color: Colors.white,
+      shadowColor: Colors.black12,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(17),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 12),
+            _buildChapter(),
+            const SizedBox(height: 12),
+            _buildArabic(),
+            const SizedBox(height: 12),
+            _buildBangla(),
+            const SizedBox(height: 12),
+            _buildReference(),
+            const SizedBox(height: 12),
+            _buildActions(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: green,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            '${hadith.number}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(text: 'হাদিস নং '),
+                    TextSpan(
+                      text: '${hadith.number}',
+                      style: TextStyle(
+                        color: green,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'সহীহ বুখারী',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 7,
+          ),
+          decoration: BoxDecoration(
+            color: green,
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: const Text(
+            'সহিহ হাদিস',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        IconButton(
+          tooltip: 'বুকমার্ক',
+          onPressed: onBookmark,
+          icon: Icon(
+            bookmarked
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
+            color: bookmarked ? gold : deepGreen,
+            size: 28,
+          ),
+        ),
+        const Icon(
+          Icons.more_vert_rounded,
+          color: Colors.black87,
+          size: 27,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChapter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: softGreen,
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.menu_book_rounded,
+            color: green,
+            size: 25,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              hadith.chapter,
+              style: TextStyle(
+                color: deepGreen,
+                fontSize: 15,
+                height: 1.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArabic() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F9F6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: green.withValues(alpha: .08),
+        ),
+      ),
+      child: Text(
+        hadith.arabic,
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.right,
+        style: const TextStyle(
+          fontSize: 22,
+          height: 2.05,
+          color: Color(0xFF17231D),
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBangla() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 7,
+          ),
+          decoration: BoxDecoration(
+            color: softGreen,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.menu_book_rounded,
+                color: green,
+                size: 22,
+              ),
+              const SizedBox(width: 7),
+              Text(
+                'বাংলা অনুবাদ',
+                style: TextStyle(
+                  color: green,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 9),
+        Text(
+          hadith.bengali,
+          style: const TextStyle(
+            fontSize: 17,
+            height: 1.75,
+            color: Color(0xFF18211D),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReference() {
+    if (hadith.note.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.menu_book_outlined,
+          color: Colors.blueGrey.shade400,
+          size: 25,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            hadith.note,
+            style: TextStyle(
+              color: Colors.blueGrey.shade500,
+              fontSize: 12.5,
+              height: 1.55,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActions(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _ActionButton(
+            icon: Icons.verified_rounded,
+            label: 'হাদিসের মান',
+            color: green,
+            onTap: () => _showGrade(context),
+          ),
+          _ActionButton(
+            icon: Icons.menu_book_outlined,
+            label: 'নোট/রেফারেন্স',
+            color: green,
+            onTap: () => _showNote(context),
+          ),
+          _ActionButton(
+            icon: Icons.copy_rounded,
+            label: 'কপি',
+            color: green,
+            onTap: () => _copyHadith(context),
+          ),
+          _ActionButton(
+            icon: bookmarked
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
+            label: 'বুকমার্ক',
+            color: bookmarked ? gold : green,
+            onTap: onBookmark,
+          ),
+          _ActionButton(
+            icon: favorite
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
+            label: 'প্রিয়',
+            color: favorite ? Colors.red : green,
+            onTap: onFavorite,
+          ),
+          _ActionButton(
+            icon: Icons.info_outline_rounded,
+            label: 'ব্যাখ্যা',
+            color: green,
+            onTap: () => _showExplanation(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showGrade(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        child: Row(
+          children: [
+            Icon(Icons.verified_rounded, color: green, size: 30),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                hadith.grade,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showNote(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        child: Text(
+          hadith.note.isEmpty
+              ? 'এই হাদিসের কোনো নোট/রেফারেন্স নেই।'
+              : hadith.note,
+          style: const TextStyle(
+            fontSize: 15,
+            height: 1.7,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _copyHadith(BuildContext context) {
+    final text = '''
+হাদিস নং ${hadith.number}
+সহীহ বুখারী
+
+${hadith.chapter}
+
+${hadith.arabic}
+
+${hadith.bengali}
+
+${hadith.grade}
+
+${hadith.note}
+''';
+
+    Clipboard.setData(ClipboardData(text: text));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('হাদিস কপি করা হয়েছে।'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showExplanation(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => const Padding(
+        padding: EdgeInsets.fromLTRB(20, 8, 20, 28),
+        child: Text(
+          'এই হাদিসের বিস্তারিত ব্যাখ্যা পরবর্তী ধাপে নির্ভরযোগ্য সুন্নি সূত্র অনুযায়ী যুক্ত করা হবে।',
+          style: TextStyle(
+            fontSize: 16,
+            height: 1.7,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 7),
+      child: Material(
+        color: const Color(0xFFEAF6F0),
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 13,
+              vertical: 9,
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 19, color: color),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingAction extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _FloatingAction({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: tooltip,
+      mini: true,
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      tooltip: tooltip,
+      onPressed: onTap,
+      child: Icon(icon),
+    );
+  }
+}

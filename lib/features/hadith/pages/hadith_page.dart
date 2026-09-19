@@ -1,39 +1,17 @@
 import 'package:flutter/material.dart';
 
+import 'bukhari_home_page.dart';
+
 class HadithPage extends StatelessWidget {
   const HadithPage({super.key});
 
-  static const List<Map<String, String>> books = [
-    {
-      'name': 'সহীহ বুখারী',
-      'author': 'ইমাম মুহাম্মদ ইবনে ইসমাঈল আল-বুখারী (রহ.)',
-      'death': 'মৃত্যু ২৫৬ হিজরি',
-    },
-    {
-      'name': 'সহীহ মুসলিম',
-      'author': 'ইমাম মুসলিম ইবনুল হাজ্জাজ (রহ.)',
-      'death': 'মৃত্যু ২৬১ হিজরি',
-    },
-    {
-      'name': 'সুনানে নাসায়ী',
-      'author': 'ইমাম আহমদ ইবনে শুআইব আন-নাসায়ী (রহ.)',
-      'death': 'মৃত্যু ৩০৩ হিজরি',
-    },
-    {
-      'name': 'সুনানে আবু দাউদ',
-      'author': 'ইমাম আবু দাউদ সুলাইমান ইবনে আল-আশআস (রহ.)',
-      'death': 'মৃত্যু ২৭৫ হিজরি',
-    },
-    {
-      'name': 'জামে আত-তিরমিযী',
-      'author': 'ইমাম আবু ঈসা মুহাম্মদ ইবনে ঈসা আত-তিরমিযী (রহ.)',
-      'death': 'মৃত্যু ২৭৯ হিজরি',
-    },
-    {
-      'name': 'সুনান ইবনে মাজাহ',
-      'author': 'ইমাম মুহাম্মদ ইবনে ইয়াযিদ ইবনে মাজাহ (রহ.)',
-      'death': 'মৃত্যু ২৭৩ হিজরি',
-    },
+  static const List<String> books = [
+    'সহীহ বুখারী',
+    'সহীহ মুসলিম',
+    'সুনানে নাসায়ী',
+    'সুনান আবু দাউদ',
+    'জামে আত-তিরমিযী',
+    'সুনান ইবনে মাজাহ',
   ];
 
   @override
@@ -46,23 +24,21 @@ class HadithPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.fromLTRB(12, 14, 12, 24),
         itemCount: books.length,
         itemBuilder: (context, index) {
           final book = books[index];
 
           return Card(
-            margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-            elevation: 2,
+            margin: const EdgeInsets.only(bottom: 10),
+            elevation: 1,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 10,
-              ),
+              minVerticalPadding: 10,
               leading: CircleAvatar(
+                radius: 20,
                 backgroundColor: const Color(0xFFE8F5EE),
                 child: Text(
                   '${index + 1}',
@@ -73,27 +49,32 @@ class HadithPage extends StatelessWidget {
                 ),
               ),
               title: Text(
-                book['name']!,
+                book,
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  '${book['author']!}\n${book['death']!}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    height: 1.5,
-                  ),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
-                size: 18,
+                size: 16,
               ),
-              onTap: () {},
+              onTap: () {
+                if (index == 0) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BukhariHomePage(),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$book শীঘ্রই যুক্ত হবে'),
+                    ),
+                  );
+                }
+              },
             ),
           );
         },

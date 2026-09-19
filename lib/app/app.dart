@@ -36,7 +36,7 @@ class _SirajumMonirAppState extends State<SirajumMonirApp> {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: _themeController.themeMode,
-          home: const SplashPage(),
+          home: SplashPage(),
         );
       },
     );
