@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../prayer/pages/prayer_page.dart';
-import '../../hijri/pages/hijri_page.dart';
+import '../../calendar/pages/calendar_home_page.dart';
 import '../../ramadan/pages/ramadan_page.dart';
 import '../../tasbih/pages/tasbih_page.dart';
 import '../../settings/pages/settings_page.dart';
@@ -25,7 +25,7 @@ class HomeSecondaryGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final features = <Map<String, dynamic>>[
       {'title': 'নামাজ ও আমল', 'icon': Icons.mosque, 'page': const PrayerPage()},
-      {'title': 'ইসলামিক ক্যালেন্ডার', 'icon': Icons.calendar_month, 'page': const HijriPage()},
+      {'title': 'ইসলামিক ক্যালেন্ডার', 'icon': Icons.calendar_month, 'page': const CalendarHomePage()},
       {'title': 'রমজান', 'icon': Icons.nights_stay, 'page': const RamadanPage()},
       {'title': 'তাসবিহ', 'icon': Icons.favorite, 'page': const TasbihPage()},
       {'title': 'নোটিফিকেশন', 'icon': Icons.notifications, 'page': const NotificationsPage()},

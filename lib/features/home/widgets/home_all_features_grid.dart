@@ -4,7 +4,7 @@ import '../../prayer/pages/prayer_page.dart';
 import '../../quran/pages/quran_page.dart';
 import '../../hadith/pages/hadith_page.dart';
 import '../../fatwa/pages/fatwa_page.dart';
-import '../../hijri/pages/hijri_page.dart';
+import '../../calendar/pages/calendar_home_page.dart';
 import '../../ramadan/pages/ramadan_page.dart';
 import '../../tasbih/pages/tasbih_page.dart';
 import '../../audio_quran/pages/audio_quran_page.dart';
@@ -43,7 +43,7 @@ class HomeAllFeaturesGrid extends StatelessWidget {
       {'title': 'দোয়া', 'icon': Icons.volunteer_activism, 'page': const DuaPage()},
       {'title': 'কিবলা', 'icon': Icons.explore, 'page': const QiblaPage()},
       {'title': 'নামাজ ও আমল', 'icon': Icons.mosque, 'page': const PrayerPage()},
-      {'title': 'ইসলামিক ক্যালেন্ডার', 'icon': Icons.calendar_month, 'page': const HijriPage()},
+      {'title': 'ইসলামিক ক্যালেন্ডার', 'icon': Icons.calendar_month, 'page': const CalendarHomePage()},
       {'title': 'রমজান', 'icon': Icons.nights_stay, 'page': const RamadanPage()},
       {'title': 'তাসবিহ', 'icon': Icons.favorite, 'page': const TasbihPage()},
       {'title': 'হজ ও উমরাহ', 'icon': Icons.mosque_outlined, 'page': const HajjUmrahPage()},

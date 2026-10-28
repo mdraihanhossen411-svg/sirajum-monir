@@ -2,6 +2,7 @@ class BukhariHadith {
   final int number;
   final String internationalNumber;
   final String chapter;
+  final String narrator;
   final String arabic;
   final String bengali;
   final String grade;
@@ -11,6 +12,7 @@ class BukhariHadith {
     required this.number,
     required this.internationalNumber,
     required this.chapter,
+    required this.narrator,
     required this.arabic,
     required this.bengali,
     required this.grade,

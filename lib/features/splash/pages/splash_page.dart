@@ -69,6 +69,7 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   void dispose() {
+    _controller.dispose();
     _animationController.dispose();
     super.dispose();
   }

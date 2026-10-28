@@ -13,9 +13,9 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
+  Future<void>? _initializationFuture;
 
-  final DailyContentService _dailyContentService =
-      DailyContentService();
+  final DailyContentService _dailyContentService = DailyContentService();
 
   static const String _dailyChannelId = 'daily_islamic_content';
   static const String _dailyChannelName = 'দৈনিক ইসলামিক নোটিফিকেশন';
@@ -27,7 +27,9 @@ class NotificationService {
   static const String _prayerChannelDescription =
       'পাঁচ ওয়াক্ত নামাজের সময়ের নোটিফিকেশন';
 
-  Future<void> initialize() async {
+  Future<void> initialize() => _initializationFuture ??= _initialize();
+
+  Future<void> _initialize() async {
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
 
@@ -35,13 +37,12 @@ class NotificationService {
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     );
 
-    await _plugin.initialize(
-      settings: settings,
-    );
+    await _plugin.initialize(settings: settings);
 
     await _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
   }
 
@@ -80,14 +81,11 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
-      androidScheduleMode:
-          AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 
-  Future<void> scheduleUpcomingAyahNotifications({
-    int days = 30,
-  }) async {
+  Future<void> scheduleUpcomingAyahNotifications({int days = 30}) async {
     final now = tz.TZDateTime.now(tz.local);
 
     for (int offset = 0; offset < days; offset++) {
@@ -98,15 +96,13 @@ class NotificationService {
         now.day + offset,
       );
 
-      final content =
-          await _dailyContentService.getForDate(date);
+      final content = await _dailyContentService.getForDate(date);
 
       if (content == null) {
         continue;
       }
 
-      final ayahText =
-          await _dailyContentService.getAyahBanglaText(
+      final ayahText = await _dailyContentService.getAyahBanglaText(
         surahNumber: content.ayah.surahNumber,
         ayahNumber: content.ayah.ayahNumber,
       );
@@ -129,22 +125,19 @@ class NotificationService {
   Future<void> scheduleTodayContent() async {
     final now = tz.TZDateTime.now(tz.local);
 
-    final content =
-        await _dailyContentService.getToday();
+    final content = await _dailyContentService.getToday();
 
     if (content == null) {
       return;
     }
 
-    final ayahText =
-        await _dailyContentService.getAyahBanglaText(
+    final ayahText = await _dailyContentService.getAyahBanglaText(
       surahNumber: content.ayah.surahNumber,
       ayahNumber: content.ayah.ayahNumber,
     );
 
     if (ayahText.isNotEmpty) {
-      final ayahBody =
-          '$ayahText\n${content.ayah.source}';
+      final ayahBody = '$ayahText\n${content.ayah.source}';
 
       await scheduleDaily(
         id: _notificationId(now, 1),
@@ -205,29 +198,21 @@ class NotificationService {
 
     final prayerController = PrayerController();
 
-    final activePrayers =
-        enabledPrayers ?? const [1, 2, 3, 4, 5];
+    final activePrayers = enabledPrayers ?? const [1, 2, 3, 4, 5];
 
     // প্রথমে আজকের location resolve করি.
     // GPS সফল হলে AdhanService-এ GPS coordinates বসবে।
     // GPS ব্যর্থ হলে saved district ব্যবহার হবে।
-    await prayerController.getTodayPrayerTimes(
-      useGps: useGps,
-    );
+    await prayerController.getTodayPrayerTimes(useGps: useGps);
 
     final adhanService = AdhanService();
 
     final now = tz.TZDateTime.now(tz.local);
 
     for (int offset = 0; offset < days; offset++) {
-      final date = DateTime(
-        now.year,
-        now.month,
-        now.day + offset,
-      );
+      final date = DateTime(now.year, now.month, now.day + offset);
 
-      final prayerTimes =
-          adhanService.getPrayerTimes(date);
+      final prayerTimes = adhanService.getPrayerTimes(date);
 
       final prayers = [
         prayerTimes.fajr,
@@ -256,9 +241,7 @@ class NotificationService {
           prayer.time.second,
         );
 
-        if (!scheduledDate.isAfter(
-          tz.TZDateTime.now(tz.local),
-        )) {
+        if (!scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
           continue;
         }
 
@@ -273,69 +256,74 @@ class NotificationService {
             android: AndroidNotificationDetails(
               _prayerChannelId,
               _prayerChannelName,
-              channelDescription:
-                  _prayerChannelDescription,
+              channelDescription: _prayerChannelDescription,
               importance: Importance.high,
               priority: Priority.high,
             ),
           ),
-          androidScheduleMode:
-              AndroidScheduleMode.inexactAllowWhileIdle,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         );
       }
     }
   }
 
-  Future<void> cancelPrayerNotifications({
-    int days = 14,
-  }) async {
+  Future<void> cancelPrayerNotifications({int days = 14}) async {
     final now = tz.TZDateTime.now(tz.local);
 
     for (int offset = -1; offset < days; offset++) {
-      final date = DateTime(
-        now.year,
-        now.month,
-        now.day + offset,
-      );
+      final date = DateTime(now.year, now.month, now.day + offset);
 
-      for (int prayerType = 1;
-          prayerType <= 5;
-          prayerType++) {
-        await _plugin.cancel(id: 
-          _prayerNotificationId(date, prayerType),
-        );
+      for (int prayerType = 1; prayerType <= 5; prayerType++) {
+        await _plugin.cancel(id: _prayerNotificationId(date, prayerType));
       }
     }
   }
 
-  int _prayerNotificationId(
-    DateTime date,
-    int prayerType,
-  ) {
-    final dayOfYear =
-        date.difference(
-              DateTime(date.year, 1, 1),
-            ).inDays +
-            1;
-
-    return (date.year * 100000) +
-        (dayOfYear * 100) +
-        10 +
-        prayerType;
+  // Calendar-event reminders use a separate ID range.
+  Future<bool> scheduleCalendarEventReminder({
+    required int eventId,
+    required String title,
+    required String body,
+    required DateTime dateTime,
+  }) async {
+    await initialize();
+    final scheduled = tz.TZDateTime.from(dateTime, tz.local);
+    if (!scheduled.isAfter(tz.TZDateTime.now(tz.local))) {
+      return false;
+    }
+    await _plugin.zonedSchedule(
+      id: 500000000 + (eventId % 100000000),
+      title: title,
+      body: body,
+      scheduledDate: scheduled,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'calendar_event_reminders',
+          'ক্যালেন্ডার ইভেন্ট রিমাইন্ডার',
+          channelDescription: 'ব্যক্তিগত ইভেন্টের নির্ধারিত স্মরণিকা',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+    return true;
   }
 
-  int _notificationId(
-    DateTime date,
-    int type,
-  ) {
-    final dayOfYear =
-        date.difference(
-              DateTime(date.year, 1, 1),
-            ).inDays +
-            1;
+  Future<void> cancelCalendarEventReminder(int eventId) async {
+    await initialize();
+    await _plugin.cancel(id: 500000000 + (eventId % 100000000));
+  }
 
-    return (date.year * 10000) +
-        (dayOfYear * 10) +
-        type;
+  int _prayerNotificationId(DateTime date, int prayerType) {
+    final dayOfYear = date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+
+    return (date.year * 100000) + (dayOfYear * 100) + 10 + prayerType;
+  }
+
+  int _notificationId(DateTime date, int type) {
+    final dayOfYear = date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+
+    return (date.year * 10000) + (dayOfYear * 10) + type;
   }
 }

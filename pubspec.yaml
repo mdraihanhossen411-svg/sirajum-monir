@@ -32,14 +32,19 @@ dependencies:
   flutter:
     sdk: flutter
   adhan: ^2.0.0+1
+  share_plus: ^13.3.1
   geolocator: ^14.0.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.5
+  http: ^1.5.0
   flutter_local_notifications: ^22.3.0
   timezone: ^0.11.1
   syncfusion_flutter_pdfviewer: 34.2.7
+  flutter_compass: ^0.8.1
+  vibration: ^3.2.1
+  hijri: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,6 +66,14 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  fonts:
+    - family: MeQuran
+      fonts:
+        - asset: assets/fonts/MeQuran.ttf
+    - family: KFGQ
+      fonts:
+        - asset: assets/fonts/UthmanTN1-Ver10.otf
+
   assets:
     - assets/json/quran/
     - assets/json/quran/core/
